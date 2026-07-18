@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { registerService, loginService, getCurrentUser } from "./userService.js";
+import { registerService, loginService, getGoogleAuthorizationURL, handleGoogleLogin } from "./userService.js";
 import { setAuthCookie, clearAuthCookie } from "../utils/cookie.js";
 
 export const register = async (
@@ -76,6 +76,46 @@ export const me = async (
             success: true,
             user: req.user,
         });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const googleLogin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+
+        const googleAuthURL = await getGoogleAuthorizationURL();
+
+        return res.redirect(googleAuthURL);
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const googleCallback = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+
+        const { code } = req.query;
+
+        if (!code || typeof code !== "string") {
+            throw new Error("Authorization code is missing.");
+        }
+
+        const result = await handleGoogleLogin(code);
+
+        setAuthCookie(res, result.token);
+
+        return res.redirect(process.env.CLIENT_URL || "http://localhost:3000");
 
     } catch (error) {
         next(error);

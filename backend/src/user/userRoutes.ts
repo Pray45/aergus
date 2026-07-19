@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
     register,
     login,
+    refreshToken,
     googleLogin, 
     googleCallback, 
     // githubLogin, 
@@ -15,6 +16,7 @@ const authRouter = Router();
 
 authRouter.post("/register", register);
 authRouter.post("/login", login);
+authRouter.post("/refresh", refreshToken);
 authRouter.get("/google", googleLogin);
 authRouter.get("/google/callback", googleCallback);
 // authRouter.get("/github", githubLogin);

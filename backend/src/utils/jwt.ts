@@ -6,7 +6,13 @@ export interface JwtPayload {
     userId: number;
 }
 
-export const generateToken = (payload: JwtPayload): string => {
+export const generateAccessToken = (payload: JwtPayload): string => {
+    return jwt.sign(payload, JWT_SECRET, {
+        expiresIn: "15m",
+    });
+};
+
+export const generateRefreshToken = (payload: JwtPayload): string => {
     return jwt.sign(payload, JWT_SECRET, {
         expiresIn: "7d",
     });

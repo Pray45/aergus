@@ -34,3 +34,12 @@ export const userProviders = pgTable(
         providerUnique: unique().on(table.provider, table.providerId)
     })
 );
+
+
+export const refreshTokens = pgTable("refresh_tokens", {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    token: text("token").notNull().unique(),
+    expiresAt: timestamp("expires_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});

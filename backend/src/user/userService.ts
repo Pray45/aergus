@@ -2,9 +2,9 @@ import bcrypt from "bcrypt";
 import { and, eq } from "drizzle-orm";
 
 import { db } from "../db/index.js";
-import { userProviders, users } from "../db/schema/userSchema.js";
+import { userProviders, users, refreshTokens } from "../db/schema/userSchema.js";
 import { GOOGLE_AUTH_URL, GOOGLE_TOKEN_URL, GOOGLE_USERINFO_URL } from "../config/google.js";
-import { generateToken } from "../utils/jwt.js";
+import { generateAccessToken, generateRefreshToken, verifyToken } from "../utils/jwt.js";
 import axios from "axios";
 
 const SALT_ROUNDS = 10;
@@ -21,10 +21,12 @@ interface Login {
 }
 
 type GoogleProfile = {
-    id: string | number;
+    sub?: string;
+    id?: string | number;
     email?: string;
     name?: string;
     userName?: string;
+    picture?: string;
 };
 
 const registerService = async (data: Register) => {
@@ -51,8 +53,17 @@ const registerService = async (data: Register) => {
         })
         .returning();
 
-    const token = generateToken({
+    const accessToken = generateAccessToken({
         userId: user.id,
+    });
+    const refreshToken = generateRefreshToken({
+        userId: user.id,
+    });
+
+    await db.insert(refreshTokens).values({
+        userId: user.id,
+        token: refreshToken,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
 
     return {
@@ -61,7 +72,8 @@ const registerService = async (data: Register) => {
             email: user.email,
             userName: user.userName,
         },
-        token,
+        accessToken,
+        refreshToken,
     };
 }
 
@@ -92,8 +104,17 @@ const loginService = async (data: Login) => {
         throw new Error("Invalid credentials.");
     }
 
-    const token = generateToken({
+    const accessToken = generateAccessToken({
         userId: user.id,
+    });
+    const refreshToken = generateRefreshToken({
+        userId: user.id,
+    });
+
+    await db.insert(refreshTokens).values({
+        userId: user.id,
+        token: refreshToken,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
 
     return {
@@ -102,7 +123,8 @@ const loginService = async (data: Login) => {
             email: user.email,
             userName: user.userName,
         },
-        token,
+        accessToken,
+        refreshToken,
     };
 }
 
@@ -120,6 +142,7 @@ const getCurrentUser = async (userId: number) => {
         id: user.id,
         email: user.email,
         userName: user.userName,
+        avatar: user.avatar,
     };
 }
 
@@ -130,7 +153,7 @@ const getGoogleAuthorizationURL = () => {
         response_type: "code",
         scope: "openid email profile",
         access_type: "offline",
-        prompt: "consent",
+        prompt: "select_account",
     });
 
     return `${GOOGLE_AUTH_URL}?${params.toString()}`;
@@ -174,14 +197,14 @@ const getGoogleUserprofile = async (accessToken: string) => {
 
 const handleGoogleLogin = async (code: string) => {
     const tokenResponse = await exchangeGoogleCode(code);
-    const accessToken = tokenResponse.access_token;
+    const googleAccessToken = tokenResponse.access_token;
 
-    if (!accessToken) {
+    if (!googleAccessToken) {
         throw new Error("Google did not return an access token.");
     }
 
-    const googleUserProfile = (await getGoogleUserprofile(accessToken)) as GoogleProfile;
-    const providerId = String(googleUserProfile.id);
+    const googleUserProfile = (await getGoogleUserprofile(googleAccessToken)) as GoogleProfile;
+    const providerId = String(googleUserProfile.sub || googleUserProfile.id);
 
     let linkedUser = await db.query.userProviders.findFirst({
         where: and(
@@ -199,13 +222,24 @@ const handleGoogleLogin = async (code: string) => {
             throw new Error("Google account is linked to a missing user.");
         }
 
+        const accessToken = generateAccessToken({ userId: existingUser.id });
+        const refreshToken = generateRefreshToken({ userId: existingUser.id });
+
+        await db.insert(refreshTokens).values({
+            userId: existingUser.id,
+            token: refreshToken,
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        });
+
         return {
             user: {
                 id: existingUser.id,
                 email: existingUser.email,
                 userName: existingUser.userName,
+                avatar: existingUser.avatar,
             },
-            token: generateToken({ userId: existingUser.id }),
+            accessToken,
+            refreshToken,
         };
     }
 
@@ -224,10 +258,18 @@ const handleGoogleLogin = async (code: string) => {
             .values({
                 email: googleUserProfile.email,
                 userName: googleUserProfile.name!,
+                avatar: googleUserProfile.picture,
             })
             .returning();
 
         localUser = createdUser;
+    } else if (!localUser.avatar && googleUserProfile.picture) {
+        const [updatedUser] = await db
+            .update(users)
+            .set({ avatar: googleUserProfile.picture })
+            .where(eq(users.id, localUser.id))
+            .returning();
+        localUser = updatedUser;
     }
 
     await db
@@ -239,14 +281,65 @@ const handleGoogleLogin = async (code: string) => {
         })
         .onConflictDoNothing();
 
+    const accessToken = generateAccessToken({ userId: localUser.id });
+    const refreshToken = generateRefreshToken({ userId: localUser.id });
+
+    await db.insert(refreshTokens).values({
+        userId: localUser.id,
+        token: refreshToken,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+
     return {
         user: {
             id: localUser.id,
             email: localUser.email,
             userName: localUser.userName,
+            avatar: localUser.avatar,
         },
-        token: generateToken({ userId: localUser.id }),
+        accessToken,
+        refreshToken,
     };
 };
 
-export { registerService, loginService, getCurrentUser, getGoogleAuthorizationURL, exchangeGoogleCode, getGoogleUserprofile, handleGoogleLogin };
+const revokeRefreshTokenService = async (token: string) => {
+    await db.delete(refreshTokens).where(eq(refreshTokens.token, token));
+};
+
+const refreshTokenService = async (oldToken: string) => {
+    let payload;
+    try {
+        payload = verifyToken(oldToken);
+    } catch (err) {
+        throw new Error("Invalid or expired refresh token.");
+    }
+
+    const existingToken = await db.query.refreshTokens.findFirst({
+        where: eq(refreshTokens.token, oldToken),
+    });
+
+    if (!existingToken || existingToken.expiresAt < new Date()) {
+        if (existingToken) {
+            await db.delete(refreshTokens).where(eq(refreshTokens.token, oldToken));
+        }
+        throw new Error("Invalid or expired refresh token.");
+    }
+
+    await db.delete(refreshTokens).where(eq(refreshTokens.token, oldToken));
+
+    const accessToken = generateAccessToken({ userId: payload.userId });
+    const refreshToken = generateRefreshToken({ userId: payload.userId });
+
+    await db.insert(refreshTokens).values({
+        userId: payload.userId,
+        token: refreshToken,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+
+    return {
+        accessToken,
+        refreshToken,
+    };
+};
+
+export { registerService, loginService, getCurrentUser, getGoogleAuthorizationURL, exchangeGoogleCode, getGoogleUserprofile, handleGoogleLogin, revokeRefreshTokenService, refreshTokenService };

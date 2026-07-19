@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { registerService, loginService, getGoogleAuthorizationURL, handleGoogleLogin } from "./userService.js";
-import { setAuthCookie, clearAuthCookie } from "../utils/cookie.js";
+import { registerService, loginService, getGoogleAuthorizationURL, handleGoogleLogin, revokeRefreshTokenService, refreshTokenService } from "./userService.js";
+import { setAuthCookies, clearAuthCookies, REFRESH_TOKEN_COOKIE_NAME } from "../utils/cookie.js";
 
 export const register = async (
     req: Request,
@@ -11,7 +11,7 @@ export const register = async (
 
         const result = await registerService(req.body);
 
-        setAuthCookie(res, result.token);
+        setAuthCookies(res, result.accessToken, result.refreshToken);
 
         return res.status(201).json({
             success: true,
@@ -33,7 +33,7 @@ export const login = async (
 
         const result = await loginService(req.body);
 
-        setAuthCookie(res, result.token);
+        setAuthCookies(res, result.accessToken, result.refreshToken);
 
         return res.status(200).json({
             success: true,
@@ -53,7 +53,12 @@ export const logout = async (
 ) => {
     try {
 
-        clearAuthCookie(res);
+        const refreshTokenVal = req.cookies[REFRESH_TOKEN_COOKIE_NAME];
+        if (refreshTokenVal) {
+            await revokeRefreshTokenService(refreshTokenVal);
+        }
+
+        clearAuthCookies(res);
 
         return res.status(200).json({
             success: true,
@@ -113,9 +118,38 @@ export const googleCallback = async (
 
         const result = await handleGoogleLogin(code);
 
-        setAuthCookie(res, result.token);
+        setAuthCookies(res, result.accessToken, result.refreshToken);
 
         return res.redirect(process.env.CLIENT_URL || "http://localhost:3000");
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const refreshToken = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const token = req.cookies[REFRESH_TOKEN_COOKIE_NAME];
+
+        if (!token) {
+            return res.status(401).json({
+                success: false,
+                message: "Refresh token is missing.",
+            });
+        }
+
+        const result = await refreshTokenService(token);
+
+        setAuthCookies(res, result.accessToken, result.refreshToken);
+
+        return res.status(200).json({
+            success: true,
+            message: "Token refreshed successfully.",
+        });
 
     } catch (error) {
         next(error);

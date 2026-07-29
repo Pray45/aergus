@@ -1,23 +1,86 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #ff3100;
+  --color-primary-hover: #ff451a;
+  --color-surface: #0a0a0a;
+  --color-surface-lowest: #050505;
+  --color-surface-container: #0d0d0d;
+  --color-surface-container-high: #121212;
+  --color-hairline: #2a2a2a;
+  --color-on-surface: #e5e2e1;
+  --color-on-surface-variant: #e5beb5;
+  
+  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", monospace;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --kinetic-primary: #ff3100;
+  --kinetic-bg: #000000;
+  --kinetic-surface: #050505;
+  --kinetic-border: #2a2a2a;
+  --kinetic-text: #e5e2e1;
+  --kinetic-text-muted: rgba(255, 255, 255, 0.6);
+  --kinetic-text-dim: rgba(255, 255, 255, 0.4);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background-color: var(--kinetic-bg);
+  color: var(--kinetic-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
+
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 50%,
+      rgba(0, 0, 0, 0.1) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.1;
+}
+
+.red-banding {
+  position: fixed;
+  top: 20%;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 49, 0, 0.05) 50%, transparent 100%);
+  border-top: 1px solid rgba(255, 49, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 49, 0, 0.1);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hairline-border {
+  border: 1px solid var(--kinetic-border);
+}
+
+.hairline-border-focus:focus-within {
+  border-color: var(--kinetic-primary);
+}
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24;
+  font-size: 20px;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #e5e2e1;
+  -webkit-box-shadow: 0 0 0 1000px #000 inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+

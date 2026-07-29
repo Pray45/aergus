@@ -8,7 +8,7 @@ export const setAuthCookies = (res: Response, accessToken: string, refreshToken:
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: 1 * 60 * 1000, // 15 Minutes
+        maxAge: 15 * 60 * 1000, // 15 Minutes
     });
 
     res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, {

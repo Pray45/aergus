@@ -129,7 +129,7 @@ const RegisterPage: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {mode === "register" && (
                 <Field
-                  label="FULL_NAME"
+                  label="NAME"
                   placeholder="ID_ENTITY"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
@@ -138,7 +138,7 @@ const RegisterPage: React.FC = () => {
               )}
 
               <Field
-                label="CONTACT_REF"
+                label="EMAIL"
                 type="email"
                 placeholder="EMAIL_ADDR"
                 value={email}
@@ -147,7 +147,7 @@ const RegisterPage: React.FC = () => {
               />
 
               <Field
-                label="ACCESS_KEY"
+                label="PASSWORD"
                 type="password"
                 placeholder="••••••••••••"
                 value={password}

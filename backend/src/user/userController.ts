@@ -120,7 +120,7 @@ export const googleCallback = async (
 
         setAuthCookies(res, result.accessToken, result.refreshToken);
 
-        return res.redirect(process.env.CLIENT_URL || "http://localhost:3000");
+        return res.redirect(`${process.env.CLIENT_URL || "http://localhost:3000"}/dash`);
 
     } catch (error) {
         next(error);

@@ -10,12 +10,14 @@ export interface User {
   email: string;
   userName: string;
   avatar?: string | null;
+  role?: string; // Optional role for access control (e.g. 'admin', 'user')
 }
 
 interface AuthState {
   user: User | null;
   token: string | null;
   isLoggedIn: boolean;
+  checkingAuth: boolean;
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
   setIsLoggedIn: (value: boolean) => void;
@@ -35,6 +37,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   token: null,
   isLoggedIn: false,
+  checkingAuth: true,
 
   setIsLoggedIn: (value: boolean) => set({ isLoggedIn: value }),
   setUser: (user: User | null) => set({ user }),
@@ -89,6 +92,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   checkSession: async () => {
     try {
+      set({ checkingAuth: true });
       const response = await axios.get(`${API_BASE_URL}/api/auth/me`);
       if (response.data && response.data.success) {
         set({ user: response.data.user, isLoggedIn: true });
@@ -97,6 +101,40 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
     } catch (err) {
       set({ user: null, isLoggedIn: false, token: null });
+    } finally {
+      set({ checkingAuth: false });
     }
   },
 }));
+
+// Response interceptor to handle token refresh automatically
+axios.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      originalRequest.url &&
+      !originalRequest.url.includes("/auth/refresh") &&
+      !originalRequest.url.includes("/auth/login") &&
+      !originalRequest.url.includes("/auth/register")
+    ) {
+      originalRequest._retry = true;
+      try {
+        // Call refresh endpoint to get new access token cookie
+        await axios.post(`${API_BASE_URL}/api/auth/refresh`);
+        // Retry the original request
+        return axios(originalRequest);
+      } catch (refreshError) {
+        // If refresh fails, clear auth state
+        useAuthStore.getState().setUser(null);
+        useAuthStore.getState().setToken(null);
+        useAuthStore.getState().setIsLoggedIn(false);
+        return Promise.reject(refreshError);
+      }
+    }
+    return Promise.reject(error);
+  }
+);

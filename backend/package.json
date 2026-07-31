@@ -15,13 +15,14 @@
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.22.0",
     "postgres": "^3.4.9",
+    "slugify": "^1.6.9",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@neondatabase/serverless": "^1.1.0",
-    "@types/cors": "^2.8.19",
     "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.1.1",

@@ -1,86 +1,70 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #ff3100;
-  --color-primary-hover: #ff451a;
-  --color-surface: #0a0a0a;
-  --color-surface-lowest: #050505;
-  --color-surface-container: #0d0d0d;
-  --color-surface-container-high: #121212;
-  --color-hairline: #2a2a2a;
-  --color-on-surface: #e5e2e1;
-  --color-on-surface-variant: #e5beb5;
+
+  /* Specific Aergus brand color definitions for utility classes */
+  --color-aergus-primary: var(--aergus-primary);
+  --color-aergus-primary-hover: var(--aergus-primary-hover);
+  --color-aergus-bg: var(--aergus-bg);
+  --color-aergus-card: var(--aergus-card);
+  --color-aergus-border: var(--aergus-border);
+  --color-aergus-text: var(--aergus-text);
+  --color-aergus-text-dim: color-mix(in srgb, var(--aergus-text) calc(var(--aergus-text-dim) * 100%), transparent);
+
+  /* Spacing Variables mapped to standard Tailwind spacing scale */
+  --spacing-sidebar-width: var(--aergus-sidebar-width);
+  --spacing-header-height: var(--aergus-header-height);
   
+  --spacing-aergus-xs: var(--aergus-space-xs);
+  --spacing-aergus-sm: var(--aergus-space-sm);
+  --spacing-aergus-md: var(--aergus-space-md);
+  --spacing-aergus-lg: var(--aergus-space-lg);
+  --spacing-aergus-xl: var(--aergus-space-xl);
+
   --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "Geist Mono", "JetBrains Mono", monospace;
 }
 
 :root {
-  --kinetic-primary: #ff3100;
-  --kinetic-bg: #000000;
-  --kinetic-surface: #050505;
-  --kinetic-border: #2a2a2a;
-  --kinetic-text: #e5e2e1;
-  --kinetic-text-muted: rgba(255, 255, 255, 0.6);
-  --kinetic-text-dim: rgba(255, 255, 255, 0.4);
+
+  
+  
+  /* COLOR SYSTEM (Aergus Brand Palette) */
+
+  --aergus-primary: #ff3100; /* Used for primary actions, active navigation indicator, badges, and focal highlights. */
+  --aergus-primary-hover: #ff451a; /* Slightly brighter/different shade for button and interaction hovers. */  
+  --aergus-bg: #0C0C0C; /*Applied to the base canvas/workspace body of the application. */
+  --aergus-card: #1a1a1a; /*Slightly elevated surfaces, sidebars, containers, and cards. */
+  --aergus-border: #2a2a2a; /* Used for layout dividers, borders, outlines, and structural guidelines. */
+  --aergus-text: #e5e2e1; /*High-contrast text color for primary headings, active item text, and critical details. */
+  --aergus-text-dim: 0.4; /* Opacity value used for descriptions, secondary text, metadata, and keyboard shortcuts. */
+
+
+
+  /* SPACING & LAYOUT SYSTEM */
+
+  --aergus-sidebar-width: 260px; /* Fixed horizontal space allocated to the navigation sidebar. */
+  --aergus-header-height: 64px; /* Fixed vertical space for the top header. */
+    
+  --aergus-space-xs: 4px; /* Ideal for tight gaps between list items, status indicators, and inner badges. */
+  --aergus-space-sm: 8px; /* Used for micro-spacing, small gaps, and horizontal/vertical item margins (p-2, gap-2). */
+  --aergus-space-md: 12px; /* Standard spacing for inner paddings of cards, dropdown items, list rows (p-3, px-3 py-2). */  
+  --aergus-space-lg: 16px; /* Standard gap between different dashboard modules, widgets, and sidebar groups (p-4, gap-4). */
+  --aergus-space-xl: 24px; /* Primary outer padding for major workspace layouts and header content (p-6, px-6). */
 }
 
+/* Global resets and enhancements to make the dashboard more premium and professional */
 body {
-  background-color: var(--kinetic-bg);
-  color: var(--kinetic-text);
+  background-color: var(--aergus-bg);
+  color: var(--aergus-text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
-.scanlines {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0) 50%,
-      rgba(0, 0, 0, 0.1) 50%
-  );
-  background-size: 100% 4px;
-  pointer-events: none;
-  z-index: 50;
-  opacity: 0.1;
+/* Custom selection color */
+::selection {
+  background-color: var(--aergus-primary);
+  color: #ffffff;
 }
-
-.red-banding {
-  position: fixed;
-  top: 20%;
-  left: 0;
-  right: 0;
-  height: 120px;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 49, 0, 0.05) 50%, transparent 100%);
-  border-top: 1px solid rgba(255, 49, 0, 0.1);
-  border-bottom: 1px solid rgba(255, 49, 0, 0.1);
-  z-index: 0;
-  pointer-events: none;
-}
-
-.hairline-border {
-  border: 1px solid var(--kinetic-border);
-}
-
-.hairline-border-focus:focus-within {
-  border-color: var(--kinetic-primary);
-}
-
-.material-symbols-outlined {
-  font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 24;
-  font-size: 20px;
-}
-
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus {
-  -webkit-text-fill-color: #e5e2e1;
-  -webkit-box-shadow: 0 0 0 1000px #000 inset;
-  transition: background-color 5000s ease-in-out 0s;
-}
-

@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "../store/authStore";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -97,6 +99,8 @@ function WorkspaceSwitcher({
   selected?: string;
   onSelect?: (ws: string) => void;
 }) {
+
+  const workSpaces = ["Acme Corp", "Personal Workspace", "Client Sandbox"]
   const [isOpen, setIsOpen] = useState(false);
   const [internalSelected, setInternalSelected] = useState("Acme Corp");
 
@@ -107,23 +111,23 @@ function WorkspaceSwitcher({
     <div className="relative">
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between px-3 py-2 mb-4 rounded-lg bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] cursor-pointer transition-colors select-none group"
+        className="flex items-center justify-between px-aergus-md py-aergus-sm mb-aergus-lg rounded-lg bg-aergus-text/[0.02] border border-aergus-border hover:bg-aergus-text/[0.04] cursor-pointer transition-colors select-none group"
       >
-        <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-[5px] bg-[#ff3100] text-white flex items-center justify-center font-bold text-[13px] shadow-[0_0_10px_rgba(255,49,0,0.2)]">
+        <div className="flex items-center gap-aergus-md">
+          <div className="w-7 h-7 rounded-[5px] bg-aergus-primary text-aergus-text flex items-center justify-center font-bold text-[13px] shadow-[0_0_10px_color-mix(in_srgb,var(--aergus-primary)_20%,transparent)]">
             {current.charAt(0)}
           </div>
           <div className="flex flex-col overflow-hidden">
-            <span className="text-[12.5px] font-medium leading-none mb-1 text-white truncate max-w-[120px]">
+            <span className="text-[12.5px] font-medium leading-none mb-aergus-xs text-aergus-text truncate max-w-[120px]">
               {current}
             </span>
-            <span className="text-[9px] text-white/30 leading-none uppercase tracking-wider font-semibold">
+            <span className="text-[9px] text-aergus-text-dim leading-none uppercase tracking-wider font-semibold">
               Secure Instance
             </span>
           </div>
         </div>
         <ChevronDown
-          className="w-3.5 h-3.5 text-white/30 group-hover:text-white/60 transition-colors shrink-0"
+          className="w-3.5 h-3.5 text-aergus-text-dim group-hover:text-aergus-text transition-colors shrink-0"
           strokeWidth={1.5}
         />
       </div>
@@ -134,22 +138,23 @@ function WorkspaceSwitcher({
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute top-[48px] left-0 w-full bg-[#0a0a0a] border border-white/5 rounded-lg shadow-2xl z-50 py-1 flex flex-col gap-0.5 animate-in fade-in zoom-in-95 duration-100">
-            {["Acme Corp", "Personal Workspace", "Client Sandbox"].map((ws) => (
+          <div className="absolute top-[48px] left-0 w-full bg-aergus-bg border border-aergus-border rounded-lg shadow-2xl z-50 py-aergus-xs flex flex-col gap-aergus-xs animate-in fade-in zoom-in-95 duration-100">
+            {workSpaces.map((ws) => (
               <div
                 key={ws}
                 onClick={() => {
                   handleSelect(ws);
                   setIsOpen(false);
                 }}
-                className={`px-3 py-2 mx-1 text-[12.5px] rounded-md cursor-pointer transition-colors ${current === ws ? "bg-[#ff3100]/10 text-[#ff3100] font-medium" : "text-white/70 hover:bg-white/5"}`}
+                className={`px-aergus-md py-aergus-sm mx-aergus-xs text-[12.5px] rounded-md cursor-pointer transition-colors ${current === ws ? "bg-aergus-primary/10 text-aergus-primary font-medium" : "text-aergus-text-dim hover:text-aergus-text hover:bg-aergus-text/[0.05]"}`}
               >
                 {ws}
               </div>
             ))}
-            <div className="h-px bg-white/5 my-1 mx-2" />
-            <div className="px-3 py-2 mx-1 text-[12.5px] text-white/30 hover:bg-white/5 rounded-md cursor-pointer flex items-center gap-2 transition-colors">
-              <span className="text-[15px] leading-none mb-0.5">+</span> Create Workspace
+            <div className="h-px bg-aergus-border my-aergus-xs mx-aergus-sm" />
+            <div className="px-aergus-md py-aergus-sm mx-aergus-xs text-[12.5px] text-aergus-text-dim hover:text-aergus-text hover:bg-aergus-text/[0.05] rounded-md cursor-pointer flex items-center gap-aergus-sm transition-colors">
+              <span className="text-[15px] leading-none mb-0.5">+</span> Create
+              Workspace
             </div>
           </div>
         </>
@@ -184,25 +189,25 @@ function NavItem({
   return (
     <div className="flex flex-col w-full relative">
       <div
-        className={`group relative flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-all duration-150 select-none
+        className={`group relative flex items-center justify-between px-aergus-md py-aergus-sm rounded-lg cursor-pointer transition-all duration-150 select-none
           ${
             isActive
-              ? "bg-white/[0.05] text-white font-medium"
-              : "text-white/50 hover:bg-white/[0.02] hover:text-white/80"
+              ? "bg-aergus-text/[0.05] text-aergus-text font-medium"
+              : "text-aergus-text-dim hover:bg-aergus-text/[0.02] hover:text-aergus-text"
           }
         `}
-        style={{ paddingLeft: `${level * 12 + 12}px` }}
+        style={{ paddingLeft: `${level * 12 + 12}px` }} // Aligned with --aergus-space-md (12px)
         onClick={handleClick}
       >
         {/* Minimalist vertical red accent line */}
         {isActive && (
-          <div className="absolute left-0 w-[3px] h-3.5 bg-[#ff3100] rounded-r" />
+          <div className="absolute left-0 w-[3px] h-3.5 bg-aergus-primary rounded-r" />
         )}
 
         <div className="flex items-center gap-2.5">
           <item.icon
             className={`w-[15px] h-[15px] transition-colors
-              ${isActive ? "text-[#ff3100]" : "text-white/40 group-hover:text-white/70"}
+              ${isActive ? "text-aergus-primary" : "text-aergus-text-dim group-hover:text-aergus-text"}
             `}
             strokeWidth={1.5}
           />
@@ -213,18 +218,18 @@ function NavItem({
 
         <div className="flex items-center gap-2">
           {item.shortcut && (
-            <kbd className="hidden group-hover:inline-flex items-center justify-center h-4.5 px-1.5 text-[9px] font-mono text-white/35 bg-white/5 border border-white/5 rounded">
+            <kbd className="hidden group-hover:inline-flex items-center justify-center h-4.5 px-1.5 text-[9px] font-mono text-aergus-text-dim/80 bg-aergus-text/5 border border-aergus-border rounded">
               {item.shortcut}
             </kbd>
           )}
           {item.badge && (
-            <span className="flex items-center justify-center min-w-[18px] h-4.5 px-1.5 text-[9px] font-bold rounded-full bg-[#ff3100]/10 text-[#ff3100] border border-[#ff3100]/20">
+            <span className="flex items-center justify-center min-w-[18px] h-4.5 px-1.5 text-[9px] font-bold rounded-full bg-aergus-primary/10 text-aergus-primary border border-aergus-primary/20">
               {item.badge}
             </span>
           )}
           {hasChildren && (
             <ChevronRight
-              className={`w-3 h-3 text-white/20 transition-transform duration-150 ${isOpen ? "rotate-90" : ""}`}
+              className={`w-3 h-3 text-aergus-text-dim/60 transition-transform duration-150 ${isOpen ? "rotate-90" : ""}`}
               strokeWidth={2}
             />
           )}
@@ -237,9 +242,9 @@ function NavItem({
             isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
           }`}
         >
-          <div className="overflow-hidden min-h-0 relative flex flex-col gap-0.5 mt-0.5">
+          <div className="overflow-hidden min-h-0 relative flex flex-col gap-aergus-xs mt-aergus-xs">
             <div
-              className="absolute top-0 bottom-0 border-l border-white/5"
+              className="absolute top-0 bottom-0 border-l border-aergus-border"
               style={{ left: `${level * 12 + 19}px` }}
             />
             {item.children!.map((child) => (
@@ -271,24 +276,38 @@ export default function Sidebar({
   activeWorkspace?: string;
   onWorkspaceSelect?: (ws: string) => void;
 }) {
+  const router = useRouter();
+  const logout = useAuthStore((state) => state.logout);
   const [internalId, setInternalId] = useState("home");
   const currentId = activeId !== undefined ? activeId : internalId;
-  const handleSelect = onSelect || setInternalId;
+
+  const handleSelect = (id: string) => {
+    if (id === "logout") {
+      logout();
+      router.push("/login");
+    } else {
+      if (onSelect) {
+        onSelect(id);
+      } else {
+        setInternalId(id);
+      }
+    }
+  };
 
   return (
     <div
-      className={`flex flex-col w-[260px] h-screen bg-[#050505] border-r border-white/5 p-3 font-mono text-white select-none ${className}`}
+      className={`flex flex-col w-sidebar-width h-screen bg-aergus-bg border-r border-aergus-border p-aergus-md font-mono text-aergus-text select-none ${className}`}
     >
       <WorkspaceSwitcher
         selected={activeWorkspace}
         onSelect={onWorkspaceSelect}
       />
 
-      <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] flex flex-col gap-4 mt-2">
+      <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] flex flex-col gap-aergus-lg mt-aergus-sm">
         {mockNavGroups.map((group, idx) => (
-          <div key={idx} className="flex flex-col gap-0.5">
+          <div key={idx} className="flex flex-col gap-aergus-xs">
             {group.heading && (
-              <span className="px-3 mb-1 text-[9px] font-semibold tracking-[0.15em] text-white/25 uppercase">
+              <span className="px-aergus-md mb-aergus-xs text-[9px] font-semibold tracking-[0.15em] text-aergus-text-dim uppercase">
                 {group.heading}
               </span>
             )}
@@ -304,7 +323,7 @@ export default function Sidebar({
         ))}
       </div>
 
-      <div className="mt-auto pt-4 border-t border-white/5 flex flex-col gap-0.5">
+      <div className="mt-auto pt-aergus-lg border-t border-aergus-border flex flex-col gap-aergus-xs">
         {mockBottomItems.map((item) => (
           <NavItem
             key={item.id}

@@ -3,8 +3,10 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "../store/authStore";
+import CreateWS from "./CreateWS";
+import AergusLoader from "../components/Loaing";
 
-export default function DashLayout({ children }: { children: React.ReactNode }) {
+export default function Page() {
   const router = useRouter();
   const { checkSession, isLoggedIn, checkingAuth } = useAuthStore();
 
@@ -19,16 +21,12 @@ export default function DashLayout({ children }: { children: React.ReactNode }) 
   }, [checkingAuth, isLoggedIn, router]);
 
   if (checkingAuth) {
-    return (
-      <div className="min-h-screen bg-aergus-bg flex items-center justify-center font-mono text-aergus-text text-sm">
-        Loading...
-      </div>
-    );
+    return <AergusLoader />;
   }
 
   if (!isLoggedIn) {
     return null;
   }
 
-  return <>{children}</>;
+  return <CreateWS />;
 }

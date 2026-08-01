@@ -15,3 +15,12 @@ export const findBySlug = async (slug: string) => {
 
   return foundWorkspace ?? null;
 };
+
+export const findByOwnerId = async (userId: number) => {
+  const foundWorkspaces = await db
+    .select()
+    .from(workspace)
+    .where(eq(workspace.ownerId, userId));
+
+  return foundWorkspaces;
+};

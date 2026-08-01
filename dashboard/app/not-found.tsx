@@ -9,7 +9,6 @@ export default function NotFound() {
   return (
     <div className="min-h-screen bg-[#000000] text-[#e5e2e1] flex flex-col items-center justify-center p-6 select-none font-mono">
       <div className="max-w-md w-full flex flex-col items-center text-center">
-        
         {/* Simple 404 Text */}
         <h1 className="text-8xl font-bold tracking-tight text-[#ff3100]">
           404
@@ -30,7 +29,6 @@ export default function NotFound() {
         >
           {isLoggedIn ? "Go to Dashboard" : "Go to Home"}
         </Link>
-
       </div>
     </div>
   );

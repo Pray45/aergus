@@ -1,4 +1,5 @@
 import { createWorkspaceService } from "./workspaceService.js";
+import { findByOwnerId } from "./workspaceRepository.js";
 import { Request, Response, NextFunction } from "express";
 
 export const createWorkspace = async (
@@ -26,12 +27,31 @@ export const getAllWorkspaces = async (req: Request, res: Response) => {
   try {
     // @ts-ignore
     const userId = req.user.id;
+
+    const workspaces = await findByOwnerId(userId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Workspaces fetched successfully",
+      data: workspaces,
+    });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error", error: error });
   }
 };
 
 export const getWorkspaceById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error", error: error });
+  }
+};
+
+export const getAllProjectsOfWorkspace = async (
+  req: Request,
+  res: Response,
+) => {
   try {
     const { id } = req.params;
   } catch (error) {

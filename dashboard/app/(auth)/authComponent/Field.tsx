@@ -30,14 +30,14 @@ export const Field: React.FC<FieldProps> = ({
 
   return (
     <div className="space-y-2">
-      <label className="font-mono text-[11px] font-bold uppercase tracking-[0.15em] text-white/60 flex items-center gap-2">
+      <label className="font-mono text-[11px] font-bold uppercase tracking-[0.15em] text-aergus-text/60 flex items-center gap-2">
         {label}
-        <span className="w-1 h-1 bg-[#ff3100]"></span>
+        <span className="w-1 h-1 bg-aergus-primary"></span>
       </label>
       <div
-        className={`relative hairline-border hairline-border-focus bg-black rounded-sm transition-all group ${
+        className={`relative border border-aergus-border focus-within:border-aergus-primary bg-aergus-bg rounded-sm transition-all group ${
           isFocused
-            ? "shadow-[0_0_20px_rgba(255,49,0,0.1)] border-[#ff3100]"
+            ? "shadow-[0_0_20px_rgba(255,49,0,0.1)] border-aergus-primary"
             : ""
         }`}
       >
@@ -50,13 +50,13 @@ export const Field: React.FC<FieldProps> = ({
           required={required}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          className="w-full bg-transparent border-none text-white placeholder:text-white/20 focus:ring-0 focus:outline-none py-3 px-4 font-mono text-sm"
+          className="w-full bg-transparent border-none text-aergus-text placeholder:text-aergus-text/20 focus:ring-0 focus:outline-none py-3 px-4 font-mono text-sm"
         />
         {type === "password" && (
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-[#ff3100] transition-colors cursor-pointer"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-aergus-text/40 hover:text-aergus-primary transition-colors cursor-pointer"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? <LucideEye /> : <LucideEyeOff />}
@@ -65,7 +65,7 @@ export const Field: React.FC<FieldProps> = ({
       </div>
       {helperText && (
         <div className="flex justify-between items-center mt-1">
-          <p className="text-[9px] text-white/30 font-mono uppercase tracking-tighter">
+          <p className="text-[9px] text-aergus-text/30 font-mono uppercase tracking-tighter">
             {helperText}
           </p>
         </div>

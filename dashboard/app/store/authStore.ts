@@ -3,14 +3,14 @@ import { create } from "zustand";
 
 axios.defaults.withCredentials = true;
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
 export interface User {
   id: number;
   email: string;
   userName: string;
   avatar?: string | null;
-  role?: string; // Optional role for access control (e.g. 'admin', 'user')
 }
 
 interface AuthState {
@@ -136,5 +136,5 @@ axios.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  },
 );

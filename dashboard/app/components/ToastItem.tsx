@@ -52,10 +52,14 @@ export const ToastItem: React.FC<ToastItemProps> = ({ toast }) => {
 
       {/* Content */}
       <div className="flex-grow space-y-1 pr-4">
-        <header className={`font-bold ${current.textColor} uppercase tracking-wider text-[10px]`}>
+        <header
+          className={`font-bold ${current.textColor} uppercase tracking-wider text-[10px]`}
+        >
           {current.label}
         </header>
-        <p className="text-[#e5e2e1] leading-relaxed uppercase tracking-tight">{toast.message}</p>
+        <p className="text-[#e5e2e1] leading-relaxed uppercase tracking-tight">
+          {toast.message}
+        </p>
       </div>
 
       {/* Manual Dismiss */}

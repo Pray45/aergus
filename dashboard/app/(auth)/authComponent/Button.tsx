@@ -1,28 +1,28 @@
-import React from 'react';
+import React from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'github' | 'link';
+  variant?: "primary" | "github" | "link";
   fullWidth?: boolean;
   children: React.ReactNode;
   icon?: React.ReactNode;
 }
 
 export const Button: React.FC<ButtonProps> = ({
-  variant = 'primary',
+  variant = "primary",
   fullWidth = true,
   children,
   icon,
-  className = '',
+  className = "",
   ...props
 }) => {
-  if (variant === 'github') {
+  if (variant === "github") {
     return (
       <button
         type="button"
-        className={`w-full h-12 flex items-center justify-center gap-3 bg-white hover:bg-[#ff3100] transition-all duration-300 rounded-sm group mb-10 overflow-hidden relative ${className}`}
+        className={`w-full h-12 flex items-center justify-center gap-3 bg-white hover:bg-aergus-primary transition-all duration-300 rounded-sm group mb-10 overflow-hidden relative ${className}`}
         {...props}
       >
-        <div className="absolute inset-0 bg-[#ff3100] translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none" />
+        <div className="absolute inset-0 bg-aergus-primary translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none" />
         {icon || (
           <svg
             className="w-5 h-5 fill-black group-hover:fill-white z-10 transition-colors duration-300"
@@ -38,11 +38,11 @@ export const Button: React.FC<ButtonProps> = ({
     );
   }
 
-  if (variant === 'link') {
+  if (variant === "link") {
     return (
       <button
         type="button"
-        className={`text-[#ff3100] hover:text-white hover:underline underline-offset-4 transition-colors font-mono cursor-pointer ${className}`}
+        className={`text-aergus-primary hover:text-aergus-text hover:underline underline-offset-4 transition-colors font-mono cursor-pointer ${className}`}
         {...props}
       >
         {children}
@@ -53,8 +53,8 @@ export const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={`${
-        fullWidth ? 'w-full' : ''
-      } h-14 bg-[#ff3100] text-white font-mono font-bold text-sm uppercase tracking-[0.2em] rounded-sm hover:bg-[#ff451a] active:scale-[0.99] transition-all duration-200 relative overflow-hidden group cursor-pointer ${className}`}
+        fullWidth ? "w-full" : ""
+      } h-14 bg-aergus-primary text-white font-mono font-bold text-sm uppercase tracking-[0.2em] rounded-sm hover:bg-aergus-primary-hover active:scale-[0.99] transition-all duration-200 relative overflow-hidden group cursor-pointer ${className}`}
       {...props}
     >
       <span className="relative z-10 flex items-center justify-center gap-2">

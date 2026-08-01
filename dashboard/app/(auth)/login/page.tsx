@@ -4,15 +4,19 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "../../store/authStore";
 import { useToastStore } from "../../store/toastStore";
+import { useWorkspaceStore } from "../../store/workspaceStore";
 import { Card } from "../authComponent/Card";
 import { Field } from "../authComponent/Field";
 import { Button } from "../authComponent/Button";
+
+import AergusLoader from "../../components/Loaing";
 
 const RegisterPage: React.FC = () => {
   const router = useRouter();
   const { login, register, googleLogin, checkSession, isLoggedIn } =
     useAuthStore();
   const addToast = useToastStore((state) => state.addToast);
+  const fetchWorkspaces = useWorkspaceStore((state) => state.fetchWorkspaces);
 
   const [mode, setMode] = useState<"register" | "login">("register");
   const [fullName, setFullName] = useState("");
@@ -27,10 +31,22 @@ const RegisterPage: React.FC = () => {
   }, [checkSession]);
 
   useEffect(() => {
-    if (isLoggedIn) {
-      router.push("/dash");
-    }
-  }, [isLoggedIn, router]);
+    const handleRedirect = async () => {
+      if (isLoggedIn) {
+        try {
+          const list = await fetchWorkspaces();
+          if (list.length === 0) {
+            router.replace("/workspace-create");
+          } else {
+            router.replace(`/w/${list[0].slug}`);
+          }
+        } catch (err) {
+          router.replace("/workspace-create");
+        }
+      }
+    };
+    handleRedirect();
+  }, [isLoggedIn, fetchWorkspaces, router]);
 
   const handleGoogleAuth = () => {
     googleLogin();
@@ -51,7 +67,8 @@ const RegisterPage: React.FC = () => {
       }
     } catch (err: any) {
       console.error(err);
-      const errMsg = err.response?.data?.message || err.message || "Authentication failed.";
+      const errMsg =
+        err.response?.data?.message || err.message || "Authentication failed.";
       setError(errMsg);
       addToast(errMsg, "error");
     } finally {
@@ -59,8 +76,12 @@ const RegisterPage: React.FC = () => {
     }
   };
 
+  if (isLoggedIn) {
+    return <AergusLoader />;
+  }
+
   return (
-    <div className="font-mono text-[#e5e2e1] min-h-screen flex flex-col items-center justify-between relative bg-black selection:bg-[#ff3100] selection:text-white">
+    <div className="font-mono text-aergus-text min-h-screen flex flex-col items-center justify-between relative bg-aergus-bg">
       {/* Main Content Area */}
       <main className="flex-grow flex items-center justify-center w-full px-4 md:px-16 z-10 py-12">
         <div className="w-full max-w-[480px]">
@@ -80,7 +101,7 @@ const RegisterPage: React.FC = () => {
                   : "STATUS: STANDBY"
             }
             footerContent={
-              <p className="font-mono text-[11px] uppercase tracking-wider text-white/40">
+              <p className="font-mono text-[11px] uppercase tracking-wider text-aergus-text-dim">
                 {mode === "register" ? (
                   <>
                     AUTHENTICATED?{" "}
@@ -90,7 +111,7 @@ const RegisterPage: React.FC = () => {
                         setMode("login");
                         setError(null);
                       }}
-                      className="text-[#ff3100]"
+                      className="text-aergus-primary"
                     >
                       EXECUTE LOGIN
                     </Button>
@@ -104,7 +125,7 @@ const RegisterPage: React.FC = () => {
                         setMode("register");
                         setError(null);
                       }}
-                      className="text-[#ff3100]"
+                      className="text-aergus-primary"
                     >
                       REGISTER NODE
                     </Button>
@@ -119,8 +140,8 @@ const RegisterPage: React.FC = () => {
 
             {/* Divider */}
             <div className="relative flex items-center justify-center mb-10">
-              <div className="w-full h-px bg-white/10" />
-              <span className="absolute bg-[#050505] px-4 font-mono text-[10px] text-white/40 uppercase tracking-[0.2em]">
+              <div className="w-full h-px bg-aergus-border" />
+              <span className="absolute bg-aergus-card px-4 font-mono text-[10px] text-aergus-text-dim uppercase tracking-[0.2em]">
                 MANUAL INPUT REQUIRED
               </span>
             </div>

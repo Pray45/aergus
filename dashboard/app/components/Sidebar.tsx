@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "../store/authStore";
+import { useWorkspaceStore } from "../store/workspaceStore";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -28,6 +29,7 @@ export type NavItemData = {
   badge?: number | string;
   shortcut?: string;
   children?: NavItemData[];
+  href?: string;
 };
 
 export type NavGroupData = {
@@ -38,9 +40,14 @@ export type NavGroupData = {
 const mockNavGroups: NavGroupData[] = [
   {
     items: [
-      { id: "home", title: "Home", icon: LayoutDashboard },
-      { id: "inbox", title: "Inbox", icon: Inbox, badge: 12 },
-      { id: "analytics", title: "Analytics", icon: Activity },
+      { id: "home", title: "Home", icon: LayoutDashboard, href: "/home" },
+      { id: "inbox", title: "Inbox", icon: Inbox, badge: 12, href: "/inbox" },
+      {
+        id: "analytics",
+        title: "Analytics",
+        icon: Activity,
+        href: "/analytics",
+      },
     ],
   },
   {
@@ -51,19 +58,39 @@ const mockNavGroups: NavGroupData[] = [
         title: "Projects",
         icon: FolderKanban,
         children: [
-          { id: "p-active", title: "Active Nodes", icon: Hash },
-          { id: "p-archived", title: "Archived Logs", icon: Hash },
+          {
+            id: "p-active",
+            title: "Active Nodes",
+            icon: Hash,
+            href: "/projects/active",
+          },
+          {
+            id: "p-archived",
+            title: "Archived Logs",
+            icon: Hash,
+            href: "/projects/archived",
+          },
         ],
       },
-      { id: "calendar", title: "Calendar", icon: Calendar },
+      { id: "calendar", title: "Calendar", icon: Calendar, href: "/calendar" },
       {
         id: "team",
         title: "Team Permissions",
         icon: Users,
         children: [
-          { id: "t-design", title: "Designers", icon: Hash },
-          { id: "t-eng", title: "Engineering", icon: Hash },
-          { id: "t-product", title: "Product", icon: Hash },
+          {
+            id: "t-design",
+            title: "Designers",
+            icon: Hash,
+            href: "/team/design",
+          },
+          { id: "t-eng", title: "Engineering", icon: Hash, href: "/team/eng" },
+          {
+            id: "t-product",
+            title: "Product",
+            icon: Hash,
+            href: "/team/product",
+          },
         ],
       },
       {
@@ -71,41 +98,50 @@ const mockNavGroups: NavGroupData[] = [
         title: "Client nodes",
         icon: Globe,
         children: [
-          { id: "c-enterprise", title: "Enterprise", icon: Hash },
-          { id: "c-smb", title: "SMB", icon: Hash },
+          {
+            id: "c-enterprise",
+            title: "Enterprise",
+            icon: Hash,
+            href: "/customers/enterprise",
+          },
+          { id: "c-smb", title: "SMB", icon: Hash, href: "/customers/smb" },
         ],
       },
-      { id: "finance", title: "Finance/Usage", icon: CreditCard },
+      {
+        id: "finance",
+        title: "Finance/Usage",
+        icon: CreditCard,
+        href: "/finance",
+      },
     ],
   },
   {
     heading: "Developers",
     items: [
-      { id: "api", title: "API Keys", icon: Terminal },
-      { id: "webhooks", title: "Webhooks", icon: Blocks },
+      { id: "api", title: "API Keys", icon: Terminal, href: "/api" },
+      { id: "webhooks", title: "Webhooks", icon: Blocks, href: "/webhooks" },
     ],
   },
 ];
 
 const mockBottomItems: NavItemData[] = [
-  { id: "settings", title: "Settings", icon: Settings, shortcut: "⌘," },
+  {
+    id: "settings",
+    title: "Settings",
+    icon: Settings,
+    shortcut: "⌘,",
+    href: "/settings",
+  },
   { id: "logout", title: "Log out", icon: LogOut },
 ];
 
-function WorkspaceSwitcher({
-  selected,
-  onSelect,
-}: {
-  selected?: string;
-  onSelect?: (ws: string) => void;
-}) {
-
-  const workSpaces = ["Acme Corp", "Personal Workspace", "Client Sandbox"]
+function WorkspaceSwitcher() {
+  const { workspaces, activeWorkspace, setActiveWorkspace } =
+    useWorkspaceStore();
   const [isOpen, setIsOpen] = useState(false);
-  const [internalSelected, setInternalSelected] = useState("Acme Corp");
+  const router = useRouter();
 
-  const current = selected || internalSelected;
-  const handleSelect = onSelect || setInternalSelected;
+  const currentName = activeWorkspace?.name || "Select Workspace";
 
   return (
     <div className="relative">
@@ -114,12 +150,12 @@ function WorkspaceSwitcher({
         className="flex items-center justify-between px-aergus-md py-aergus-sm mb-aergus-lg rounded-lg bg-aergus-text/[0.02] border border-aergus-border hover:bg-aergus-text/[0.04] cursor-pointer transition-colors select-none group"
       >
         <div className="flex items-center gap-aergus-md">
-          <div className="w-7 h-7 rounded-[5px] bg-aergus-primary text-aergus-text flex items-center justify-center font-bold text-[13px] shadow-[0_0_10px_color-mix(in_srgb,var(--aergus-primary)_20%,transparent)]">
-            {current.charAt(0)}
+          <div className="w-7 h-7 rounded-[5px] bg-aergus-primary text-aergus-text flex items-center justify-center font-bold text-[13px] shadow-[0_0_10px_color-mix(in_srgb,var(--aergus-primary)_20%,transparent)] shrink-0">
+            {currentName.charAt(0)}
           </div>
           <div className="flex flex-col overflow-hidden">
             <span className="text-[12.5px] font-medium leading-none mb-aergus-xs text-aergus-text truncate max-w-[120px]">
-              {current}
+              {currentName}
             </span>
             <span className="text-[9px] text-aergus-text-dim leading-none uppercase tracking-wider font-semibold">
               Secure Instance
@@ -139,20 +175,27 @@ function WorkspaceSwitcher({
             onClick={() => setIsOpen(false)}
           />
           <div className="absolute top-[48px] left-0 w-full bg-aergus-bg border border-aergus-border rounded-lg shadow-2xl z-50 py-aergus-xs flex flex-col gap-aergus-xs animate-in fade-in zoom-in-95 duration-100">
-            {workSpaces.map((ws) => (
+            {workspaces.map((ws) => (
               <div
-                key={ws}
+                key={ws.id}
                 onClick={() => {
-                  handleSelect(ws);
+                  setActiveWorkspace(ws);
                   setIsOpen(false);
+                  router.push(`/w/${ws.slug}`);
                 }}
-                className={`px-aergus-md py-aergus-sm mx-aergus-xs text-[12.5px] rounded-md cursor-pointer transition-colors ${current === ws ? "bg-aergus-primary/10 text-aergus-primary font-medium" : "text-aergus-text-dim hover:text-aergus-text hover:bg-aergus-text/[0.05]"}`}
+                className={`px-aergus-md py-aergus-sm mx-aergus-xs text-[12.5px] rounded-md cursor-pointer transition-colors ${activeWorkspace?.id === ws.id ? "bg-aergus-primary/10 text-aergus-primary font-medium" : "text-aergus-text-dim hover:text-aergus-text hover:bg-aergus-text/[0.05]"}`}
               >
-                {ws}
+                {ws.name}
               </div>
             ))}
             <div className="h-px bg-aergus-border my-aergus-xs mx-aergus-sm" />
-            <div className="px-aergus-md py-aergus-sm mx-aergus-xs text-[12.5px] text-aergus-text-dim hover:text-aergus-text hover:bg-aergus-text/[0.05] rounded-md cursor-pointer flex items-center gap-aergus-sm transition-colors">
+            <div
+              onClick={() => {
+                setIsOpen(false);
+                router.push("/workspace-create");
+              }}
+              className="px-aergus-md py-aergus-sm mx-aergus-xs text-[12.5px] text-aergus-text-dim hover:text-aergus-text hover:bg-aergus-text/[0.05] rounded-md cursor-pointer flex items-center gap-aergus-sm transition-colors"
+            >
               <span className="text-[15px] leading-none mb-0.5">+</span> Create
               Workspace
             </div>
@@ -174,15 +217,37 @@ function NavItem({
   onSelect: (id: string) => void;
   level?: number;
 }) {
+  const { activeWorkspace } = useWorkspaceStore();
   const isActive = activeId === item.id;
   const hasChildren = !!item.children;
-  const [isOpen, setIsOpen] = useState(false);
+  const isChildActive =
+    hasChildren && item.children!.some((child) => child.id === activeId);
+  const [isOpen, setIsOpen] = useState(isChildActive);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isChildActive) {
+      setIsOpen(true);
+    }
+  }, [isChildActive]);
+
+  const resolveHref = (href?: string) => {
+    if (!href) return undefined;
+    if (!activeWorkspace) return href;
+    if (href === "/home") return `/w/${activeWorkspace.slug}`;
+    return `/w/${activeWorkspace.slug}${href}`;
+  };
+
+  const resolvedHref = resolveHref(item.href);
 
   const handleClick = () => {
     if (hasChildren) {
       setIsOpen(!isOpen);
     } else {
       onSelect(item.id);
+      if (resolvedHref) {
+        router.push(resolvedHref);
+      }
     }
   };
 
@@ -267,19 +332,54 @@ export default function Sidebar({
   className = "",
   activeId,
   onSelect,
-  activeWorkspace,
-  onWorkspaceSelect,
 }: {
   className?: string;
   activeId?: string;
   onSelect?: (id: string) => void;
-  activeWorkspace?: string;
-  onWorkspaceSelect?: (ws: string) => void;
 }) {
+  const { activeWorkspace } = useWorkspaceStore();
   const router = useRouter();
+  const pathname = usePathname();
   const logout = useAuthStore((state) => state.logout);
   const [internalId, setInternalId] = useState("home");
-  const currentId = activeId !== undefined ? activeId : internalId;
+
+  const getActiveId = () => {
+    if (activeId) return activeId;
+
+    const resolveHref = (href?: string) => {
+      if (!href) return undefined;
+      if (!activeWorkspace) return href;
+      if (href === "/home") return `/w/${activeWorkspace.slug}`;
+      return `/w/${activeWorkspace.slug}${href}`;
+    };
+
+    // Check main groups
+    for (const group of mockNavGroups) {
+      for (const item of group.items) {
+        const resolvedHref = resolveHref(item.href);
+        if (
+          resolvedHref === pathname ||
+          (item.id === "home" &&
+            activeWorkspace &&
+            pathname === `/w/${activeWorkspace.slug}`)
+        ) {
+          return item.id;
+        }
+        if (item.children) {
+          for (const child of item.children) {
+            if (resolveHref(child.href) === pathname) return child.id;
+          }
+        }
+      }
+    }
+    // Check bottom items
+    for (const item of mockBottomItems) {
+      if (resolveHref(item.href) === pathname) return item.id;
+    }
+    return internalId;
+  };
+
+  const currentId = getActiveId();
 
   const handleSelect = (id: string) => {
     if (id === "logout") {
@@ -298,10 +398,7 @@ export default function Sidebar({
     <div
       className={`flex flex-col w-sidebar-width h-screen bg-aergus-bg border-r border-aergus-border p-aergus-md font-mono text-aergus-text select-none ${className}`}
     >
-      <WorkspaceSwitcher
-        selected={activeWorkspace}
-        onSelect={onWorkspaceSelect}
-      />
+      <WorkspaceSwitcher />
 
       <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] flex flex-col gap-aergus-lg mt-aergus-sm">
         {mockNavGroups.map((group, idx) => (

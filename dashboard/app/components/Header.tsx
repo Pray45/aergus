@@ -2,18 +2,24 @@
 
 import { useAuthStore } from "../store/authStore";
 import { Bell } from "lucide-react";
+import { useWorkspaceStore } from "../store/workspaceStore";
+import Link from "next/link";
 const Header = () => {
   const user = useAuthStore((state) => state.user);
+  const workspace = useWorkspaceStore((state) => state.activeWorkspace);
 
   return (
     <header className="flex h-header-height items-center justify-between border-b border-aergus-border px-aergus-xl">
       <div className="flex items-center font-sans">
         <p className="text-aergus-primary font-bold text-xl pr-aergus-md tracking-tight">{`>`}</p>
-        <p className="text-aergus-text-dim text-sm font-sm ">
-          {user?.userName} /{" "}
-          <span className="text-aergus-primary text-sm font-medium">
-            project name
-          </span>
+        <Link
+          href={`/w/${workspace?.slug}`}
+          className="text-aergus-text-dim text-sm font-sm cursor-pointer hover:text-aergus-text transition-all duration-200"
+        >
+          {workspace?.name}
+        </Link>
+        <p className="ml-aergus-sm text-aergus-primary text-sm font-medium">
+          / project name
         </p>
       </div>
 

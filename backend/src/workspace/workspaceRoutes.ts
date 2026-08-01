@@ -3,6 +3,7 @@ import {
   createWorkspace,
   getAllWorkspaces,
   getWorkspaceById,
+  getAllProjectsOfWorkspace,
   updateWorkspace,
   deleteWorkspace,
 } from "./workspaceController.js";
@@ -13,6 +14,7 @@ const workspaceRouter = express.Router();
 workspaceRouter.post("/", protect, createWorkspace);
 workspaceRouter.get("/", protect, getAllWorkspaces);
 workspaceRouter.get("/:id", protect, getWorkspaceById);
+workspaceRouter.get("/:id/projects", protect, getAllProjectsOfWorkspace);
 workspaceRouter.patch("/:id", protect, updateWorkspace);
 workspaceRouter.delete("/:id", protect, deleteWorkspace);
 

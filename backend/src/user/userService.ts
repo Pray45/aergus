@@ -22,7 +22,7 @@ interface Login {
 
 type GoogleProfile = {
     sub?: string;
-    id?: string | number;
+    id?: string;
     email?: string;
     name?: string;
     userName?: string;
@@ -71,6 +71,7 @@ const registerService = async (data: Register) => {
             id: user.id,
             email: user.email,
             userName: user.userName,
+            tier: user.tier,
         },
         accessToken,
         refreshToken,
@@ -122,13 +123,14 @@ const loginService = async (data: Login) => {
             id: user.id,
             email: user.email,
             userName: user.userName,
+            tier: user.tier,
         },
         accessToken,
         refreshToken,
     };
 }
 
-const getCurrentUser = async (userId: number) => {
+const getCurrentUser = async (userId: string) => {
 
     const user = await db.query.users.findFirst({
         where: eq(users.id, userId),
@@ -143,6 +145,7 @@ const getCurrentUser = async (userId: number) => {
         email: user.email,
         userName: user.userName,
         avatar: user.avatar,
+        tier: user.tier,
     };
 }
 
@@ -237,6 +240,7 @@ const handleGoogleLogin = async (code: string) => {
                 email: existingUser.email,
                 userName: existingUser.userName,
                 avatar: existingUser.avatar,
+                tier: existingUser.tier,
             },
             accessToken,
             refreshToken,
@@ -296,6 +300,7 @@ const handleGoogleLogin = async (code: string) => {
             email: localUser.email,
             userName: localUser.userName,
             avatar: localUser.avatar,
+            tier: localUser.tier,
         },
         accessToken,
         refreshToken,

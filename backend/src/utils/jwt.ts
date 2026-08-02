@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET!;
 
 export interface JwtPayload {
-  userId: number;
+  userId: string;
 }
 
 export const generateAccessToken = (payload: JwtPayload): string => {

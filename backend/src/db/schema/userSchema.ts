@@ -1,20 +1,26 @@
 import {
     pgTable,
-    serial,
     text,
     timestamp,
-    integer,
-    unique
+    unique,
+    uuid,
+    pgEnum
 } from "drizzle-orm/pg-core";
 
+export const userTier = pgEnum("tier", [
+    "developer",
+    "team",
+    "enterprise",
+]);
 
 export const users = pgTable("users", {
 
-    id: serial("id").primaryKey(),
+    id: uuid("id").defaultRandom().primaryKey(),
     email: text("email").notNull().unique(),
     userName: text("userName").notNull(),
     avatar: text("avatar"),
     passwordHash: text("password_hash"),
+    tier: userTier("tier").default("developer").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 
@@ -24,8 +30,8 @@ export const users = pgTable("users", {
 export const userProviders = pgTable(
     "user_providers",
     {
-        id: serial("id").primaryKey(),
-        userId: integer("user_id").notNull().references(() => users.id),
+        id: uuid("id").defaultRandom().primaryKey(),
+        userId: uuid("user_id").notNull().references(() => users.id),
         provider: text("provider").notNull(),
         providerId: text("provider_id").notNull(),
         createdAt: timestamp("created_at").defaultNow().notNull()
@@ -37,8 +43,8 @@ export const userProviders = pgTable(
 
 
 export const refreshTokens = pgTable("refresh_tokens", {
-    id: serial("id").primaryKey(),
-    userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     token: text("token").notNull().unique(),
     expiresAt: timestamp("expires_at").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),

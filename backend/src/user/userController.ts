@@ -155,3 +155,47 @@ export const refreshToken = async (
         next(error);
     }
 }
+
+export const upgradeTier = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        // @ts-ignore
+        const userId = req.user.id;
+        const { tier } = req.body;
+
+        if (!tier || !["developer", "team", "enterprise"].includes(tier)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid tier specified."
+            });
+        }
+
+        const { db } = await import("../db/index.js");
+        const { users } = await import("../db/schema/userSchema.js");
+        const { eq } = await import("drizzle-orm");
+
+        const [updatedUser] = await db
+            .update(users)
+            .set({ tier, updatedAt: new Date() })
+            .where(eq(users.id, userId))
+            .returning();
+
+        return res.status(200).json({
+            success: true,
+            message: `User tier upgraded to ${tier} successfully.`,
+            user: {
+                id: updatedUser.id,
+                email: updatedUser.email,
+                userName: updatedUser.userName,
+                tier: updatedUser.tier,
+                avatar: updatedUser.avatar,
+            },
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}

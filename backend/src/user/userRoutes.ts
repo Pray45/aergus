@@ -8,7 +8,8 @@ import {
     // githubLogin, 
     // githubCallback, 
     logout,
-    me
+    me,
+    upgradeTier
 } from "./userController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
@@ -23,5 +24,6 @@ authRouter.get("/google/callback", googleCallback);
 // authRouter.get("/github/callback", githubCallback);
 authRouter.post("/logout", logout);
 authRouter.get("/me", protect, me);
+authRouter.patch("/tier", protect, upgradeTier);
 
 export default authRouter;

@@ -18,7 +18,19 @@ export const createWorkspace = async (
       message: "Workspace created successfully",
       data: workspace,
     });
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message.includes("limit") || error.message.includes("upgrade") || error.message.includes("tier")) {
+      return res.status(403).json({
+        success: false,
+        message: error.message,
+      });
+    }
+    if (error.message.includes("already exists")) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
     next(error);
   }
 };

@@ -7,10 +7,11 @@ const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
 
 export interface User {
-  id: number;
+  id: string;
   email: string;
   userName: string;
   avatar?: string | null;
+  tier?: string;
 }
 
 interface AuthState {
@@ -31,6 +32,7 @@ interface AuthState {
     password: string,
   ) => Promise<void>;
   checkSession: () => Promise<void>;
+  upgradeTier: (tier: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -103,6 +105,17 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ user: null, isLoggedIn: false, token: null });
     } finally {
       set({ checkingAuth: false });
+    }
+  },
+
+  upgradeTier: async (tier: string) => {
+    const response = await axios.patch(`${API_BASE_URL}/api/auth/tier`, {
+      tier,
+    });
+    if (response.data && response.data.success) {
+      set({ user: response.data.user });
+    } else {
+      throw new Error(response.data.message || "Failed to upgrade tier");
     }
   },
 }));

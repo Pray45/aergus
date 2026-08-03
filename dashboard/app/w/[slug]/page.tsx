@@ -1,24 +1,31 @@
 "use client";
 
-import React from "react";
-import Sidebar from "../../components/Sidebar";
-import Header from "../../components/Header";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useWorkspaceStore } from "../../store/workspaceStore";
+import { useProjectStore } from "../../store/projectStore";
+import AergusLoader from "../../components/Loaing";
 
 export default function WorkspaceHomePage() {
-  return (
-    <div className="flex h-screen w-full overflow-hidden bg-aergus-bg text-aergus-text selection:bg-aergus-primary selection:text-white font-sans">
-      <Sidebar activeId="home" />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header />
-        <main className="flex-1 overflow-y-auto p-aergus-xl">
-          <h1 className="text-xl font-bold tracking-tight text-aergus-text">
-            hello jiii kese ho
-          </h1>
-          <p className="text-[12.5px] text-aergus-text opacity-[var(--aergus-text-dim)] font-mono mt-aergus-xs">
-            Welcome back to your workspace.
-          </p>
-        </main>
-      </div>
-    </div>
-  );
+  const router = useRouter();
+  const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
+  const { projects, fetchProjects, hasFetched } = useProjectStore();
+
+  useEffect(() => {
+    if (activeWorkspace) {
+      fetchProjects(activeWorkspace.id).catch(() => {});
+    }
+  }, [activeWorkspace, fetchProjects]);
+
+  useEffect(() => {
+    if (activeWorkspace && hasFetched) {
+      if (projects.length > 0) {
+        router.replace(`/w/${activeWorkspace.slug}/p/${projects[0].slug}/dashboard`);
+      } else {
+        router.replace("/workspace/projects");
+      }
+    }
+  }, [activeWorkspace, hasFetched, projects, router]);
+
+  return <AergusLoader />;
 }

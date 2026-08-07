@@ -73,7 +73,7 @@ export const getAllProjects = async (req: Request, res: Response, next: NextFunc
 export const getProjectById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    const foundProject = await projectRepository.findById(id);
+    const foundProject = await projectRepository.findById(id as string);
 
     if (!foundProject) {
       return res.status(404).json({
@@ -96,7 +96,7 @@ export const updateProject = async (req: Request, res: Response, next: NextFunct
     const { id } = req.params;
     const { name, description, logo } = req.body;
 
-    const existing = await projectRepository.findById(id);
+    const existing = await projectRepository.findById(id as string);
     if (!existing) {
       return res.status(404).json({
         success: false,
@@ -119,7 +119,7 @@ export const updateProject = async (req: Request, res: Response, next: NextFunct
       updateData.slug = slug;
     }
 
-    const updated = await projectRepository.update(id, updateData);
+    const updated = await projectRepository.update(id as string, updateData);
 
     return res.status(200).json({
       success: true,
@@ -135,7 +135,7 @@ export const deleteProject = async (req: Request, res: Response, next: NextFunct
   try {
     const { id } = req.params;
 
-    const existing = await projectRepository.findById(id);
+    const existing = await projectRepository.findById(id as string);
     if (!existing) {
       return res.status(404).json({
         success: false,
@@ -143,7 +143,7 @@ export const deleteProject = async (req: Request, res: Response, next: NextFunct
       });
     }
 
-    await projectRepository.deleteProject(id);
+    await projectRepository.deleteProject(id as string);
 
     return res.status(200).json({
       success: true,

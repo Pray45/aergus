@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export default function AergusLoader() {
   return (
-    <div className="flex items-center justify-center h-screen bg-black">
+    <div className="flex items-center justify-center h-screen bg-aergus-bg">
       <div className="relative w-32 h-32">
         {/* Orange Piece */}
         <motion.div
@@ -40,7 +40,7 @@ export default function AergusLoader() {
           <motion.path
             d="M32 30 H66 A28 28 0 0 1 94 58 V102"
             fill="none"
-            stroke="white"
+            stroke="var(--aergus-text)"
             strokeWidth="14"
             strokeLinecap="round"
             strokeLinejoin="round"

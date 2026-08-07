@@ -53,6 +53,15 @@
   --aergus-space-xl: 24px; /* Primary outer padding for major workspace layouts and header content (p-6, px-6). */
 }
 
+.light {
+  /* LIGHT THEME COLOR SYSTEM (Override custom variables) */
+  --aergus-bg: #f9f9fb;      /* clean light grey background */
+  --aergus-card: #ffffff;    /* card and sidebar background */
+  --aergus-border: #e4e4e7;  /* border color */
+  --aergus-text: #18181b;    /* high-contrast dark text */
+  --aergus-text-dim: 0.5;    /* dim text opacity for light theme */
+}
+
 /* Global resets and enhancements to make the dashboard more premium and professional */
 body {
   background-color: var(--aergus-bg);
@@ -61,6 +70,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Custom selection color */

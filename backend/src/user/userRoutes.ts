@@ -1,15 +1,15 @@
 import { Router } from "express";
 import {
-    register,
-    login,
-    refreshToken,
-    googleLogin, 
-    googleCallback, 
-    // githubLogin, 
-    // githubCallback, 
-    logout,
-    me,
-    upgradeTier
+  register,
+  login,
+  refreshToken,
+  googleLogin,
+  googleCallback,
+  // githubLogin,
+  // githubCallback,
+  logout,
+  me,
+  upgradeTier,
 } from "./userController.js";
 import { protect } from "../middleware/authMiddleware.js";
 

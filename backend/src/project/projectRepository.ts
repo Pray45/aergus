@@ -2,17 +2,20 @@ import { eq, and } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { project } from "../db/schema/projectSchema.js";
 
-export const create = async (data: typeof project.$inferInsert) => {
+export const createProject = async (data: typeof project.$inferInsert) => {
   const [newProject] = await db.insert(project).values(data).returning();
   return newProject;
 };
 
-export const findById = async (id: string) => {
+export const findProjectById = async (id: string) => {
   const [found] = await db.select().from(project).where(eq(project.id, id));
   return found ?? null;
 };
 
-export const findBySlugAndWorkspace = async (slug: string, workspaceId: string) => {
+export const findProjectBySlugAndWorkspace = async (
+  slug: string,
+  workspaceId: string,
+) => {
   const [found] = await db
     .select()
     .from(project)
@@ -20,11 +23,17 @@ export const findBySlugAndWorkspace = async (slug: string, workspaceId: string) 
   return found ?? null;
 };
 
-export const findByWorkspaceId = async (workspaceId: string) => {
-  return await db.select().from(project).where(eq(project.workspaceId, workspaceId));
+export const findProjectByWorkspaceId = async (workspaceId: string) => {
+  return await db
+    .select()
+    .from(project)
+    .where(eq(project.workspaceId, workspaceId));
 };
 
-export const update = async (projectId: string, payload: Partial<typeof project.$inferInsert>) => {
+export const updateProject = async (
+  projectId: string,
+  payload: Partial<typeof project.$inferInsert>,
+) => {
   const [updated] = await db
     .update(project)
     .set(payload)

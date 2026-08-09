@@ -2,12 +2,12 @@ import { eq, or, and, exists } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { workspace, workspaceMembers } from "../db/schema/workspaceSchema.js";
 
-export const create = async (data: typeof workspace.$inferInsert) => {
+export const createWorkspace = async (data: typeof workspace.$inferInsert) => {
   const [newWorkspace] = await db.insert(workspace).values(data).returning();
   return newWorkspace;
 };
 
-export const findBySlug = async (slug: string) => {
+export const findWorkspaceBySlug = async (slug: string) => {
   const [foundWorkspace] = await db
     .select()
     .from(workspace)
@@ -16,7 +16,7 @@ export const findBySlug = async (slug: string) => {
   return foundWorkspace ?? null;
 };
 
-export const findById = async (id: string) => {
+export const findWorkspaceById = async (id: string) => {
   const [foundWorkspace] = await db
     .select()
     .from(workspace)
@@ -25,7 +25,7 @@ export const findById = async (id: string) => {
   return foundWorkspace ?? null;
 };
 
-export const findByOwnerId = async (userId: string) => {
+export const findWorkspaceByOwnerId = async (userId: string) => {
   const foundWorkspaces = await db
     .select()
     .from(workspace)
@@ -48,15 +48,18 @@ export const findUserWorkspaces = async (userId: string) => {
             .where(
               and(
                 eq(workspaceMembers.workspaceId, workspace.id),
-                eq(workspaceMembers.userId, userId)
-              )
-            )
-        )
-      )
+                eq(workspaceMembers.userId, userId),
+              ),
+            ),
+        ),
+      ),
     );
 };
 
-export const hasAccess = async (workspaceId: string, userId: string): Promise<boolean> => {
+export const hasAccess = async (
+  workspaceId: string,
+  userId: string,
+): Promise<boolean> => {
   const [result] = await db
     .select({ id: workspace.id })
     .from(workspace)
@@ -72,17 +75,20 @@ export const hasAccess = async (workspaceId: string, userId: string): Promise<bo
               .where(
                 and(
                   eq(workspaceMembers.workspaceId, workspace.id),
-                  eq(workspaceMembers.userId, userId)
-                )
-              )
-          )
-        )
-      )
+                  eq(workspaceMembers.userId, userId),
+                ),
+              ),
+          ),
+        ),
+      ),
     );
   return !!result;
 };
 
-export const canUpdate = async (workspaceId: string, userId: string): Promise<boolean> => {
+export const canUpdateWorkspace = async (
+  workspaceId: string,
+  userId: string,
+): Promise<boolean> => {
   const [result] = await db
     .select({ id: workspace.id })
     .from(workspace)
@@ -101,31 +107,34 @@ export const canUpdate = async (workspaceId: string, userId: string): Promise<bo
                   eq(workspaceMembers.userId, userId),
                   or(
                     eq(workspaceMembers.role, "OWNER"),
-                    eq(workspaceMembers.role, "ADMIN")
-                  )
-                )
-              )
-          )
-        )
-      )
+                    eq(workspaceMembers.role, "ADMIN"),
+                    eq(workspaceMembers.role, "MEMBER")
+                  ),
+                ),
+              ),
+          ),
+        ),
+      ),
     );
   return !!result;
 };
 
-export const isOwner = async (workspaceId: string, userId: string): Promise<boolean> => {
+export const isWorkspaceOwner = async (
+  workspaceId: string,
+  userId: string,
+): Promise<boolean> => {
   const [result] = await db
     .select({ id: workspace.id })
     .from(workspace)
-    .where(
-      and(
-        eq(workspace.id, workspaceId),
-        eq(workspace.ownerId, userId)
-      )
-    );
+    .where(and(eq(workspace.id, workspaceId), eq(workspace.ownerId, userId)));
   return !!result;
 };
 
-export const addMember = async (workspaceId: string, userId: string, role: "OWNER" | "ADMIN" | "MEMBER" | "VIEWER") => {
+export const addMember = async (
+  workspaceId: string,
+  userId: string,
+  role: "OWNER" | "ADMIN" | "MEMBER" | "VIEWER",
+) => {
   await db.insert(workspaceMembers).values({
     workspaceId,
     userId,
@@ -133,17 +142,22 @@ export const addMember = async (workspaceId: string, userId: string, role: "OWNE
   });
 };
 
-export const update = async (workspaceId: string, payload: Partial<typeof workspace.$inferInsert>) => {
-    const [updatedWorkspace] = await db
+export const updateWorkspace = async (
+  workspaceId: string,
+  payload: Partial<typeof workspace.$inferInsert>,
+) => {
+  const [updatedWorkspace] = await db
     .update(workspace)
     .set(payload)
     .where(eq(workspace.id, workspaceId))
     .returning();
 
-    return updatedWorkspace ?? null;
+  return updatedWorkspace ?? null;
 };
 
 export const deleteWorkspace = async (workspaceId: string) => {
-  await db.delete(workspaceMembers).where(eq(workspaceMembers.workspaceId, workspaceId));
+  await db
+    .delete(workspaceMembers)
+    .where(eq(workspaceMembers.workspaceId, workspaceId));
   await db.delete(workspace).where(eq(workspace.id, workspaceId));
 };

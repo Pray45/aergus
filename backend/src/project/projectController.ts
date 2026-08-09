@@ -1,40 +1,24 @@
 import { Request, Response, NextFunction } from "express";
 import * as projectRepository from "./projectRepository.js";
-import { project } from "../db/schema/projectSchema.js";
-import slugify from "slugify";
-import { randomUUID } from "crypto";
+import {
+  createProjectService,
+  updateProjectService,
+} from "./projectServices.js";
 
-export const createProject = async (req: Request, res: Response, next: NextFunction) => {
+export const createProject = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     // @ts-ignore
     const userId = req.user.id;
-    const { workspaceId, name, description, logo } = req.body;
-
-    if (!workspaceId || !name) {
-      return res.status(400).json({
-        success: false,
-        message: "Workspace ID and project name are required.",
-      });
-    }
-
-    const slug = slugify.default ? slugify.default(name, { lower: true, strict: true }) : slugify(name, { lower: true, strict: true });
-
-    const existing = await projectRepository.findBySlugAndWorkspace(slug, workspaceId);
-    if (existing) {
-      return res.status(400).json({
-        success: false,
-        message: "Project with this name already exists in the workspace.",
-      });
-    }
-
-    const newProject = await projectRepository.create({
-      id: randomUUID(),
-      workspaceId,
-      name,
-      slug,
-      description,
-      logo,
-      ownerId: userId,
+    const newProject = await createProjectService({
+      workspaceId: req.body.workspaceId,
+      name: req.body.name,
+      description: req.body.description,
+      logo: req.body.logo,
+      userId,
     });
 
     return res.status(201).json({
@@ -47,7 +31,11 @@ export const createProject = async (req: Request, res: Response, next: NextFunct
   }
 };
 
-export const getAllProjects = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllProjects = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { workspaceId } = req.query;
 
@@ -58,7 +46,8 @@ export const getAllProjects = async (req: Request, res: Response, next: NextFunc
       });
     }
 
-    const projects = await projectRepository.findByWorkspaceId(workspaceId);
+    const projects =
+      await projectRepository.findProjectByWorkspaceId(workspaceId);
 
     return res.status(200).json({
       success: true,
@@ -70,10 +59,14 @@ export const getAllProjects = async (req: Request, res: Response, next: NextFunc
   }
 };
 
-export const getProjectById = async (req: Request, res: Response, next: NextFunction) => {
+export const getProjectById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { id } = req.params;
-    const foundProject = await projectRepository.findById(id as string);
+    const foundProject = await projectRepository.findProjectById(id as string);
 
     if (!foundProject) {
       return res.status(404).json({
@@ -91,35 +84,20 @@ export const getProjectById = async (req: Request, res: Response, next: NextFunc
   }
 };
 
-export const updateProject = async (req: Request, res: Response, next: NextFunction) => {
+export const updateProject = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { id } = req.params;
-    const { name, description, logo } = req.body;
 
-    const existing = await projectRepository.findById(id as string);
-    if (!existing) {
-      return res.status(404).json({
-        success: false,
-        message: "Project not found.",
-      });
-    }
-
-    const updateData: Partial<typeof project.$inferInsert> = { description, logo };
-
-    if (name) {
-      const slug = slugify.default ? slugify.default(name, { lower: true, strict: true }) : slugify(name, { lower: true, strict: true });
-      const duplicate = await projectRepository.findBySlugAndWorkspace(slug, existing.workspaceId);
-      if (duplicate && duplicate.id !== id) {
-        return res.status(400).json({
-          success: false,
-          message: "Project with this name already exists in this workspace.",
-        });
-      }
-      updateData.name = name;
-      updateData.slug = slug;
-    }
-
-    const updated = await projectRepository.update(id as string, updateData);
+    const updated = await updateProjectService({
+      id: id as string,
+      name: req.body.name,
+      description: req.body.description,
+      logo: req.body.logo,
+    });
 
     return res.status(200).json({
       success: true,
@@ -131,11 +109,15 @@ export const updateProject = async (req: Request, res: Response, next: NextFunct
   }
 };
 
-export const deleteProject = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteProject = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { id } = req.params;
 
-    const existing = await projectRepository.findById(id as string);
+    const existing = await projectRepository.findProjectById(id as string);
     if (!existing) {
       return res.status(404).json({
         success: false,

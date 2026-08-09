@@ -1,4 +1,8 @@
-import { createWorkspaceService, updateWorkspaceService, addWorkspaceMemberService } from "./workspaceService.js";
+import {
+  createWorkspaceService,
+  updateWorkspaceService,
+  addWorkspaceMemberService,
+} from "./workspaceService.js";
 import * as workspaceRepository from "./workspaceRepository.js";
 import { Request, Response, NextFunction } from "express";
 
@@ -19,7 +23,11 @@ export const createWorkspace = async (
       data: workspace,
     });
   } catch (error: any) {
-    if (error.message.includes("limit") || error.message.includes("upgrade") || error.message.includes("tier")) {
+    if (
+      error.message.includes("limit") ||
+      error.message.includes("upgrade") ||
+      error.message.includes("tier")
+    ) {
       return res.status(403).json({
         success: false,
         message: error.message,
@@ -58,7 +66,7 @@ export const getWorkspaceById = async (req: Request, res: Response) => {
     // @ts-ignore
     const userId = req.user.id;
 
-    const workspace = await workspaceRepository.findById(id as string);
+    const workspace = await workspaceRepository.findWorkspaceById(id as string);
     if (!workspace) {
       return res.status(404).json({
         success: false,
@@ -90,7 +98,7 @@ export const updateWorkspace = async (req: Request, res: Response) => {
     // @ts-ignore
     const userId = req.user.id;
 
-    const workspace = await workspaceRepository.findById(id as string);
+    const workspace = await workspaceRepository.findWorkspaceById(id as string);
     if (!workspace) {
       return res.status(404).json({
         success: false,
@@ -98,7 +106,10 @@ export const updateWorkspace = async (req: Request, res: Response) => {
       });
     }
 
-    const canUpdate = await workspaceRepository.canUpdate(id as string, userId);
+    const canUpdate = await workspaceRepository.canUpdateWorkspace(
+      id as string,
+      userId,
+    );
     if (!canUpdate) {
       return res.status(403).json({
         success: false,
@@ -106,7 +117,10 @@ export const updateWorkspace = async (req: Request, res: Response) => {
       });
     }
 
-    const updatedWorkspace = await updateWorkspaceService(id as string, req.body);
+    const updatedWorkspace = await updateWorkspaceService(
+      id as string,
+      req.body,
+    );
 
     return res.status(200).json({
       success: true,
@@ -124,7 +138,7 @@ export const deleteWorkspace = async (req: Request, res: Response) => {
     // @ts-ignore
     const userId = req.user.id;
 
-    const workspace = await workspaceRepository.findById(id as string);
+    const workspace = await workspaceRepository.findWorkspaceById(id as string);
     if (!workspace) {
       return res.status(404).json({
         success: false,
@@ -132,7 +146,10 @@ export const deleteWorkspace = async (req: Request, res: Response) => {
       });
     }
 
-    const isOwner = await workspaceRepository.isOwner(id as string, userId);
+    const isOwner = await workspaceRepository.isWorkspaceOwner(
+      id as string,
+      userId,
+    );
     if (!isOwner) {
       return res.status(403).json({
         success: false,
@@ -186,7 +203,10 @@ export const addWorkspaceMember = async (
     if (error.message === "Workspace not found") {
       return res.status(404).json({ success: false, message: error.message });
     }
-    if (error.message.includes("permission") || error.message.includes("upgrade")) {
+    if (
+      error.message.includes("permission") ||
+      error.message.includes("upgrade")
+    ) {
       return res.status(403).json({ success: false, message: error.message });
     }
     if (error.message.includes("already") || error.message.includes("exist")) {

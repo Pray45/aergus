@@ -9,15 +9,6 @@ import {
 import { workspace } from "./workspaceSchema.js";
 import { project } from "./projectSchema.js";
 
-export const ResourceType = pgEnum("resource_type", [
-  "WEBSITE",
-  "SERVER",
-  "AGENT",
-  "DATABASE",
-  "DOCKER_HOST",
-  "CONTAINER",
-]);
-
 export const Status = pgEnum("status", [
   "ACTIVE",
   "INACTIVE",
@@ -35,11 +26,9 @@ export const resources = pgTable("resources", {
     .references(() => project.id),
 
   name: text("name").notNull(),
-  type: ResourceType(),
-  status: Status(),
+  status: Status().default("INACTIVE").notNull(),
   provider: text("provider").notNull(),
   description: text("description").notNull(),
-  metadata: jsonb("metadata").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

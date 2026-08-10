@@ -6,10 +6,11 @@ import { workspace } from "../db/schema/workspaceSchema.js";
 import { users } from "../db/schema/userSchema.js";
 import { db } from "../db/index.js";
 import { eq } from "drizzle-orm";
-
-const freeTierWorkspaceLimit = 1;
-const teamTierWorkspaceLimit = 3;
-const enterpriseTierWorkspaceLimit = 6;
+import {
+  freeTierWorkspaceLimit,
+  teamTierWorkspaceLimit,
+  enterpriseTierWorkspaceLimit,
+} from "../config/tier.js";
 
 export const createWorkspaceService = async (
   userId: string,

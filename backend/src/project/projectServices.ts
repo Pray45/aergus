@@ -2,7 +2,7 @@ import slugify from "slugify";
 import * as projectRepository from "./projectRepository.js";
 import { randomUUID } from "crypto";
 import { project } from "../db/schema/projectSchema.js";
-import { findWorkspaceById } from "../workspace/workspaceRepository.js";
+import { canUpdateWorkspace, findWorkspaceById } from "../workspace/workspaceRepository.js";
 
 export const createProjectService = async ({
   workspaceId,
@@ -19,6 +19,12 @@ export const createProjectService = async ({
 }) => {
   if (!workspaceId || !name) {
     throw new Error("Workspace ID and project name are required.");
+  }
+
+  const canCreate = canUpdateWorkspace(workspaceId, userId)
+
+  if(!canCreate){
+    throw new Error("User is not authorized to create project in this workspace");
   }
 
   const slug = slugify.default
@@ -57,11 +63,13 @@ export const updateProjectService = async ({
   name,
   description,
   logo,
+  userId,
 }: {
   id: string;
   name?: string;
   description?: string;
   logo?: string;
+  userId: string;
 }) => {
   if (!id) {
     throw new Error("Project ID is required.");
@@ -70,6 +78,12 @@ export const updateProjectService = async ({
   const existing = await projectRepository.findProjectById(id);
   if (!existing) {
     throw new Error("Project not found.");
+  }
+
+  const canUpdate = canUpdateWorkspace(existing.workspaceId, userId)
+
+  if(!canUpdate){
+    throw new Error("User is not authorized to update project in this workspace");
   }
 
   const updateData: Partial<typeof project.$inferInsert> = {

@@ -90,13 +90,16 @@ export const updateProject = async (
   next: NextFunction,
 ) => {
   try {
-    const { id } = req.params;
+    // @ts-ignore
+    const userId = req.user.id;
+    const { id } = req.body;
 
     const updated = await updateProjectService({
       id: id as string,
       name: req.body.name,
       description: req.body.description,
       logo: req.body.logo,
+      userId,
     });
 
     return res.status(200).json({

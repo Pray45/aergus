@@ -27,6 +27,8 @@ app.use("/api/workspace", (await import("./workspace/workspaceRoutes.js")).defau
 
 app.use("/api/project", (await import("./project/projectRoutes.js")).default);
 
+app.use("/api/resource", (await import("./resources/resouceRoutes.js")).default)
+
 // Global Error Handler Middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error("Global Error Handler:", err);

@@ -108,7 +108,7 @@ export const canUpdateWorkspace = async (
                   or(
                     eq(workspaceMembers.role, "OWNER"),
                     eq(workspaceMembers.role, "ADMIN"),
-                    eq(workspaceMembers.role, "MEMBER")
+                    eq(workspaceMembers.role, "MEMBER"),
                   ),
                 ),
               ),

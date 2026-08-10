@@ -1,19 +1,19 @@
-import exrpess from "express";
+import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
+
 import {
-  getResourcesByProjectId,
   createResource,
-  getResourceById,
+  getResources,
+  getResource,
   updateResource,
   deleteResource,
 } from "./resourceController.js";
 
-const resourceRoute = exrpess.Router();
+const resourceRoute = express.Router();
 
-resourceRoute.get("/:projectId/resources", protect, getResourcesByProjectId);
-resourceRoute.post("/:projectId/resources", protect, createResource);
-
-resourceRoute.get("/:resourceId", protect, getResourceById);
+resourceRoute.get("/projects/:projectId", protect, getResources);
+resourceRoute.post("/projects/:projectId", protect, createResource);
+resourceRoute.get("/:resourceId", protect, getResource);
 resourceRoute.patch("/:resourceId", protect, updateResource);
 resourceRoute.delete("/:resourceId", protect, deleteResource);
 

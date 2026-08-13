@@ -18,6 +18,7 @@ export const createResource = async (
     const resource = await createResourceService({
       userId,
       projectId: req.body.projectId,
+      type: req.body.type,
       name: req.body.name,
       provider: req.body.provider,
       description: req.body.description,
@@ -96,6 +97,7 @@ export const updateResource = async (
       projectId: req.body.projectId,
       resourceId: req.params.resourceId as string,
       name: req.body.name,
+      type: req.body.type,
       description: req.body.description,
     });
 

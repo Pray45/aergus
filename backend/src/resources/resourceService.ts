@@ -3,30 +3,42 @@ import {
   canUpdateWorkspace,
   hasAccess,
 } from "../workspace/workspaceRepository.js";
-import { createResourceRepository } from "./resourceRepository.js";
 import {
+  createResourceRepository,
   findResourcesByProjectId,
   findResourceById,
   updateResourceRepository,
   deleteResourceRepository,
 } from "./resourceRepository.js";
+import { resourceType, ResourceType } from "../db/schema/resourcesSchema.js";
+
+export const isValidResourceType = (type: string): type is ResourceType => {
+  return (resourceType.enumValues as readonly string[]).includes(type);
+};
+
 
 export const createResourceService = async ({
   userId,
   projectId,
+  type,
   name,
   description,
   provider,
 }: {
   userId: string;
   projectId: string;
+  type: ResourceType;
   name: string;
   description: string;
   provider: string;
 }) => {
   try {
-    if (!name || !projectId || !provider || !description) {
+    if (!name || !projectId || !type || !provider || !description) {
       throw new Error("Missing required fields");
+    }
+
+    if (!isValidResourceType(type)) {
+      throw new Error(`Invalid resource type: ${type}`);
     }
 
     const isprojectId = await findProjectById(projectId);
@@ -41,6 +53,8 @@ export const createResourceService = async ({
 
     const resource = await createResourceRepository({
       projectId,
+      workspaceId: isprojectId.workspaceId,
+      type,
       name,
       description,
       provider,
@@ -112,12 +126,14 @@ export const updateResourceService = async ({
   projectId,
   resourceId,
   name,
+  type,
   description,
 }: {
   userId: string;
   projectId: string;
   resourceId: string;
   name?: string;
+  type?: ResourceType;
   description?: string;
 }) => {
   const project = await findProjectById(projectId);
@@ -142,9 +158,14 @@ export const updateResourceService = async ({
     throw new Error("Resource does not belong to this project");
   }
 
+  if (type !== undefined && !isValidResourceType(type)) {
+    throw new Error(`Invalid resource type: ${type}`);
+  }
+
   const updatedResource = await updateResourceRepository({
     resourceId,
     name,
+    type,
     description,
   });
 

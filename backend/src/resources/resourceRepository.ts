@@ -1,10 +1,28 @@
 import { db } from "../db/index.js";
-import { resources } from "../db/schema/resourcesSchema.js";
+import {
+  resources,
+  ResourceType,
+  ResourceStatus,
+} from "../db/schema/resourcesSchema.js";
 import { eq } from "drizzle-orm";
 
-export const createResourceRepository = async (body: any) => {
+export interface CreateResourceData {
+  projectId: string;
+  workspaceId: string;
+  type: ResourceType;
+  name: string;
+  provider?: string | null;
+  description?: string | null;
+  status?: ResourceStatus;
+  metadata?: Record<string, unknown>;
+}
+
+export const createResourceRepository = async (body: CreateResourceData) => {
   try {
-    const createResource = await db.insert(resources).values(body);
+    const [createResource] = await db
+      .insert(resources)
+      .values(body)
+      .returning();
     return createResource;
   } catch (error) {
     throw error;
@@ -34,20 +52,26 @@ export const findResourceById = async (resourceId: string) => {
 export const updateResourceRepository = async ({
   resourceId,
   name,
+  type,
   description,
   metadata,
+  status,
 }: {
   resourceId: string;
   name?: string;
+  type?: ResourceType;
   description?: string;
   metadata?: Record<string, unknown>;
+  status?: ResourceStatus;
 }) => {
   const [updatedResource] = await db
     .update(resources)
     .set({
-      ...(name !== undefined && { name }),
-      ...(description !== undefined && { description }),
-      ...(metadata !== undefined && { metadata }),
+      name,
+      type,
+      description,
+      metadata,
+      status,
       updatedAt: new Date(),
     })
     .where(eq(resources.id, resourceId))

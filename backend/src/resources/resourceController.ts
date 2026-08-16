@@ -17,7 +17,7 @@ export const createResource = async (
     const userId = req.user.id;
     const resource = await createResourceService({
       userId,
-      projectId: req.body.projectId,
+      projectId: req.params.projectId as string,
       type: req.body.type,
       name: req.body.name,
       provider: req.body.provider,
@@ -69,8 +69,8 @@ export const getResource = async (
 
     const resource = await getResourceService({
       userId,
-      projectId: req.query.projectId as string,
       resourceId: req.params.resourceId as string,
+      projectId: req.params.projectId as string | undefined,
     });
 
     return res.status(200).json({
@@ -94,11 +94,13 @@ export const updateResource = async (
 
     const resource = await updateResourceService({
       userId,
-      projectId: req.body.projectId,
       resourceId: req.params.resourceId as string,
+      projectId: req.params.projectId as string | undefined,
       name: req.body.name,
       type: req.body.type,
       description: req.body.description,
+      status: req.body.status,
+      metadata: req.body.metadata,
     });
 
     return res.status(200).json({
@@ -122,8 +124,8 @@ export const deleteResource = async (
 
     await deleteResourceService({
       userId,
-      projectId: req.query.projectId as string,
       resourceId: req.params.resourceId as string,
+      projectId: req.params.projectId as string | undefined,
     });
 
     return res.status(200).json({

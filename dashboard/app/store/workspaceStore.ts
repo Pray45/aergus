@@ -4,7 +4,7 @@ import { create } from "zustand";
 axios.defaults.withCredentials = true;
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
 
 export interface Workspace {
   id: string;
@@ -38,7 +38,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   fetchWorkspaces: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/workspace`);
+      const response = await axios.get(`${API_BASE_URL}/workspace`);
       if (response.data && response.data.success) {
         const list = response.data.data as Workspace[];
         set({ workspaces: list, loading: false, hasFetched: true });
@@ -67,7 +67,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   createWorkspace: async (name: string, description?: string) => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/workspace`, {
+      const response = await axios.post(`${API_BASE_URL}/workspace`, {
         name,
         description,
       });

@@ -1,32 +1,30 @@
 import { db } from "../db/index.js";
 import {
   resources,
-  ResourceType,
-  ResourceStatus,
+  ResourceStatusValue,
+  ResourceTypeValue,
+  Status,
 } from "../db/schema/resourcesSchema.js";
 import { eq } from "drizzle-orm";
 
 export interface CreateResourceData {
   projectId: string;
   workspaceId: string;
-  type: ResourceType;
+  type: ResourceTypeValue;
   name: string;
   provider?: string | null;
   description?: string | null;
-  status?: ResourceStatus;
+  status?: ResourceStatusValue;
   metadata?: Record<string, unknown>;
 }
 
 export const createResourceRepository = async (body: CreateResourceData) => {
-  try {
-    const [createResource] = await db
-      .insert(resources)
-      .values(body)
-      .returning();
-    return createResource;
-  } catch (error) {
-    throw error;
-  }
+  const [createdResource] = await db
+    .insert(resources)
+    .values(body as any)
+    .returning();
+
+  return createdResource;
 };
 
 // Get all resources belonging to a project
@@ -52,26 +50,26 @@ export const findResourceById = async (resourceId: string) => {
 export const updateResourceRepository = async ({
   resourceId,
   name,
-  type,
   description,
   metadata,
   status,
+  type,
 }: {
   resourceId: string;
   name?: string;
-  type?: ResourceType;
   description?: string;
   metadata?: Record<string, unknown>;
-  status?: ResourceStatus;
+  status?: ResourceStatusValue;
+  type?: ResourceTypeValue;
 }) => {
   const [updatedResource] = await db
     .update(resources)
     .set({
-      name,
-      type,
-      description,
-      metadata,
-      status,
+      ...(name !== undefined && { name }),
+      ...(description !== undefined && { description }),
+      ...(metadata !== undefined && { metadata }),
+      ...(status !== undefined && { status }),
+      ...(type !== undefined && { type }),
       updatedAt: new Date(),
     })
     .where(eq(resources.id, resourceId))

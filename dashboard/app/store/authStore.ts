@@ -4,7 +4,7 @@ import { create } from "zustand";
 axios.defaults.withCredentials = true;
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
 
 export interface User {
   id: string;
@@ -46,11 +46,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   setToken: (token: string | null) => set({ token }),
 
   googleLogin: async () => {
-    window.location.href = `${API_BASE_URL}/api/auth/google`;
+    window.location.href = `${API_BASE_URL}/auth/google`;
   },
 
   login: async (email, password) => {
-    const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
+    const response = await axios.post(`${API_BASE_URL}/auth/login`, {
       email,
       password,
     });
@@ -66,7 +66,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   register: async (fullName, email, password) => {
-    const response = await axios.post(`${API_BASE_URL}/api/auth/register`, {
+    const response = await axios.post(`${API_BASE_URL}/auth/register`, {
       userName: fullName,
       email,
       password,
@@ -84,7 +84,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: async () => {
     try {
-      await axios.post(`${API_BASE_URL}/api/auth/logout`);
+      await axios.post(`${API_BASE_URL}/auth/logout`);
     } catch (err) {
       console.error("Backend logout error:", err);
     } finally {
@@ -95,7 +95,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   checkSession: async () => {
     try {
       set({ checkingAuth: true });
-      const response = await axios.get(`${API_BASE_URL}/api/auth/me`);
+      const response = await axios.get(`${API_BASE_URL}/auth/me`);
       if (response.data && response.data.success) {
         set({ user: response.data.user, isLoggedIn: true });
       } else {
@@ -109,7 +109,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   upgradeTier: async (tier: string) => {
-    const response = await axios.patch(`${API_BASE_URL}/api/auth/tier`, {
+    const response = await axios.patch(`${API_BASE_URL}/auth/tier`, {
       tier,
     });
     if (response.data && response.data.success) {
@@ -137,7 +137,7 @@ axios.interceptors.response.use(
       originalRequest._retry = true;
       try {
         // Call refresh endpoint to get new access token cookie
-        await axios.post(`${API_BASE_URL}/api/auth/refresh`);
+        await axios.post(`${API_BASE_URL}/auth/refresh`);
         // Retry the original request
         return axios(originalRequest);
       } catch (refreshError) {

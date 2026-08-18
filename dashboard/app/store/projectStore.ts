@@ -4,7 +4,7 @@ import { create } from "zustand";
 axios.defaults.withCredentials = true;
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
 
 export interface Project {
   id: string;
@@ -46,7 +46,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     set({ loading: true, error: null });
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/api/project?workspaceId=${workspaceId}`,
+        `${API_BASE_URL}/project?workspaceId=${workspaceId}`,
       );
       if (response.data && response.data.success) {
         const list = response.data.data as Project[];
@@ -68,7 +68,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         err.response?.data?.message ||
         err.message ||
         "Failed to fetch projects";
-      set({ error: errMsg, loading: false });
+      set({ error: errMsg, loading: false, hasFetched: true });
       throw err;
     }
   },
@@ -80,7 +80,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   ) => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/project/create`, {
+      const response = await axios.post(`${API_BASE_URL}/project/create`, {
         workspaceId,
         name,
         description,

@@ -12,7 +12,7 @@ import axios from "axios";
 import { Settings, Trash2, ShieldAlert } from "lucide-react";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
 
 export default function ProjectSettings() {
   const router = useRouter();
@@ -40,7 +40,7 @@ export default function ProjectSettings() {
     setSaving(true);
     try {
       const response = await axios.patch(
-        `${API_BASE_URL}/api/project/${activeProject.id}`,
+        `${API_BASE_URL}/project/${activeProject.id}`,
         {
           name,
           description,
@@ -73,7 +73,7 @@ export default function ProjectSettings() {
 
     setDeleting(true);
     try {
-      await axios.delete(`${API_BASE_URL}/api/project/${activeProject.id}`);
+      await axios.delete(`${API_BASE_URL}/project/${activeProject.id}`);
       addToast("PROJECT NODE INVENTORY TERMINATED", "success");
       
       // Clear active project, fetch projects, and redirect back to workspace

@@ -59,7 +59,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
         err.response?.data?.message ||
         err.message ||
         "Failed to fetch workspaces";
-      set({ error: errMsg, loading: false });
+      set({ error: errMsg, loading: false, hasFetched: true });
       throw err;
     }
   },

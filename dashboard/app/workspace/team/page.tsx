@@ -18,7 +18,7 @@ interface Member {
 }
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
 
 export default function WorkspaceTeamPage() {
   const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
@@ -61,7 +61,7 @@ export default function WorkspaceTeamPage() {
 
     setInviting(true);
     try {
-      await axios.post(`${API_BASE_URL}/api/workspace/${activeWorkspace.id}/members`, {
+      await axios.post(`${API_BASE_URL}/workspace/${activeWorkspace.id}/members`, {
         email,
         role,
       });

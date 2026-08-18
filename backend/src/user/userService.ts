@@ -156,7 +156,7 @@ const getCurrentUser = async (userId: string) => {
 const getGoogleAuthorizationURL = () => {
   const params = new URLSearchParams({
     client_id: process.env.GOOGLE_CLIENT_ID!,
-    redirect_uri: process.env.GOOGLE_REDIRECT_URI || "http://localhost:5000/api/auth/google/callback",
+    redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
     response_type: "code",
     scope: "openid email profile",
     access_type: "offline",
@@ -170,7 +170,7 @@ const exchangeGoogleCode = async (code: string) => {
   const params = new URLSearchParams({
     client_id: process.env.GOOGLE_CLIENT_ID!,
     client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-    redirect_uri: process.env.GOOGLE_REDIRECT_URI || "http://localhost:5000/api/auth/google/callback",
+    redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
     grant_type: "authorization_code",
     code,
   });

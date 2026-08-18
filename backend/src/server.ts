@@ -5,14 +5,27 @@ import cookieParser from "cookie-parser";
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
-const origin = process.env.CLIENT_URL || "http://localhost:3000";
 const app = express();
+
+// Enable trust proxy for cloud reverse proxies (e.g. Render, Railway, Vercel)
+app.set("trust proxy", 1);
 
 app.use(express.json());
 app.use(cookieParser());
+
+const clientUrls = (process.env.CLIENT_URL || "http://localhost:3000")
+  .split(",")
+  .map((url) => url.trim().replace(/\/$/, ""));
+
 app.use(
   cors({
-    origin,
+    origin: (requestOrigin, callback) => {
+      if (!requestOrigin || clientUrls.includes(requestOrigin.replace(/\/$/, ""))) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS policy rejection for origin: ${requestOrigin}`));
+      }
+    },
     credentials: true,
   }),
 );

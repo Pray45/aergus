@@ -31,12 +31,19 @@ app.use(
     origin: (requestOrigin, callback) => {
       if (!requestOrigin) return callback(null, true);
       const normalized = requestOrigin.replace(/\/$/, "");
-      if (allowedOrigins.includes(normalized)) {
+      if (
+        allowedOrigins.includes("*") ||
+        allowedOrigins.includes(normalized) ||
+        normalized.endsWith(".vercel.app")
+      ) {
         return callback(null, true);
       }
+      console.warn(`CORS blocked request from origin: ${requestOrigin}`);
       return callback(null, false);
     },
     credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization", "x-refresh-token"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   }),
 );
 

@@ -16,8 +16,13 @@ export const protect = async (
 
         let token = req.cookies[COOKIE_NAME];
 
-        if (!token && req.headers.authorization?.startsWith("Bearer ")) {
-            token = req.headers.authorization.split(" ")[1];
+        if (!token && req.headers.authorization) {
+            const authHeader = req.headers.authorization;
+            if (authHeader.toLowerCase().startsWith("bearer ")) {
+                token = authHeader.substring(7).trim();
+            } else {
+                token = authHeader.trim();
+            }
         }
 
         if (!token) {
@@ -44,12 +49,11 @@ export const protect = async (
 
         next();
 
-    } catch (error) {
-
+    } catch (error: any) {
+        console.error("Auth Middleware Exception:", error?.message || error);
         return res.status(401).json({
             success: false,
             message: "Invalid or expired token.",
         });
-
     }
 };

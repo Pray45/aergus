@@ -34,15 +34,6 @@ const clearSavedTokens = () => {
   }
 };
 
-// Request interceptor to automatically attach Authorization header
-axios.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().token || getSavedToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
 export interface User {
   id: string;
   email: string;
@@ -169,6 +160,20 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 }));
 
+// Request interceptor to automatically attach Authorization header
+axios.interceptors.request.use((config) => {
+  const token = getSavedToken() || (useAuthStore ? useAuthStore.getState().token : null);
+  if (token) {
+    if (config.headers && typeof config.headers.set === "function") {
+      config.headers.set("Authorization", `Bearer ${token}`);
+    } else {
+      config.headers = config.headers || {};
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
+
 // Response interceptor to handle token refresh automatically
 axios.interceptors.response.use(
   (response) => response,
@@ -194,7 +199,12 @@ axios.interceptors.response.use(
         if (newToken) {
           saveTokens(newToken, newRefreshToken);
           useAuthStore.getState().setToken(newToken);
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          if (originalRequest.headers && typeof originalRequest.headers.set === "function") {
+            originalRequest.headers.set("Authorization", `Bearer ${newToken}`);
+          } else {
+            originalRequest.headers = originalRequest.headers || {};
+            originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
+          }
         }
         return axios(originalRequest);
       } catch (refreshError) {

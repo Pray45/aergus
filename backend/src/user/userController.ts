@@ -27,6 +27,8 @@ export const register = async (
       success: true,
       message: "User registered successfully.",
       user: result.user,
+      token: result.accessToken,
+      refreshToken: result.refreshToken,
     });
   } catch (error) {
     next(error);
@@ -47,6 +49,8 @@ export const login = async (
       success: true,
       message: "Login successful.",
       user: result.user,
+      token: result.accessToken,
+      refreshToken: result.refreshToken,
     });
   } catch (error) {
     next(error);
@@ -130,7 +134,10 @@ export const refreshToken = async (
   next: NextFunction,
 ) => {
   try {
-    const token = req.cookies[REFRESH_TOKEN_COOKIE_NAME];
+    const token =
+      req.cookies[REFRESH_TOKEN_COOKIE_NAME] ||
+      req.body?.refreshToken ||
+      (req.headers["x-refresh-token"] as string);
 
     if (!token) {
       return res.status(401).json({
@@ -146,6 +153,8 @@ export const refreshToken = async (
     return res.status(200).json({
       success: true,
       message: "Token refreshed successfully.",
+      token: result.accessToken,
+      refreshToken: result.refreshToken,
     });
   } catch (error) {
     next(error);

@@ -13,18 +13,28 @@ app.set("trust proxy", 1);
 app.use(express.json());
 app.use(cookieParser());
 
-const clientUrls = (process.env.CLIENT_URL || "http://localhost:3000")
-  .split(",")
-  .map((url) => url.trim().replace(/\/$/, ""));
+const defaultOrigins = [
+  "http://localhost:3000",
+  "https://aergus.vercel.app",
+];
+
+const envOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(",").map((url) => url.trim().replace(/\/$/, ""))
+  : [];
+
+const allowedOrigins = Array.from(
+  new Set([...defaultOrigins, ...envOrigins]),
+);
 
 app.use(
   cors({
     origin: (requestOrigin, callback) => {
-      if (!requestOrigin || clientUrls.includes(requestOrigin.replace(/\/$/, ""))) {
-        callback(null, true);
-      } else {
-        callback(new Error(`CORS policy rejection for origin: ${requestOrigin}`));
+      if (!requestOrigin) return callback(null, true);
+      const normalized = requestOrigin.replace(/\/$/, "");
+      if (allowedOrigins.includes(normalized)) {
+        return callback(null, true);
       }
+      return callback(null, false);
     },
     credentials: true,
   }),
@@ -45,7 +55,8 @@ app.use("/api/resource", (await import("./resources/resourceRoutes.js")).default
 // Global Error Handler Middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error("Global Error Handler:", err);
-  return res.status(err.status || 500).json({
+  const status = err.statusCode || err.status || 500;
+  return res.status(status).json({
     success: false,
     message: err.message || "Internal Server Error",
   });

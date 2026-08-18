@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET!;
+const JWT_SECRET = process.env.JWT_SECRET || "aergus_default_jwt_secret_key_prod_fallback";
 
 export interface JwtPayload {
   userId: string;

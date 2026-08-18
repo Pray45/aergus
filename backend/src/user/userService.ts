@@ -17,6 +17,7 @@ import {
   generateRefreshToken,
   verifyToken,
 } from "../utils/jwt.js";
+import { AppError } from "../utils/AppError.js";
 import axios from "axios";
 
 const SALT_ROUNDS = 10;
@@ -50,7 +51,7 @@ const registerService = async (data: Register) => {
   });
 
   if (existingEmail) {
-    throw new Error("Email already exists.");
+    throw new AppError("Email already exists.", 409);
   }
 
   const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
@@ -97,17 +98,17 @@ const loginService = async (data: Login) => {
   });
 
   if (!user) {
-    throw new Error("Invalid credentials.");
+    throw new AppError("Invalid credentials.", 401);
   }
 
   if (!user.passwordHash) {
-    throw new Error("This account uses social login.");
+    throw new AppError("This account uses social login.", 400);
   }
 
   const validPassword = await bcrypt.compare(password, user.passwordHash);
 
   if (!validPassword) {
-    throw new Error("Invalid credentials.");
+    throw new AppError("Invalid credentials.", 401);
   }
 
   const accessToken = generateAccessToken({
@@ -141,7 +142,7 @@ const getCurrentUser = async (userId: string) => {
   });
 
   if (!user) {
-    throw new Error("User not found.");
+    throw new AppError("User not found.", 404);
   }
 
   return {
@@ -321,7 +322,7 @@ const refreshTokenService = async (oldToken: string) => {
   try {
     payload = verifyToken(oldToken);
   } catch (err) {
-    throw new Error("Invalid or expired refresh token.");
+    throw new AppError("Invalid or expired refresh token.", 401);
   }
 
   const existingToken = await db.query.refreshTokens.findFirst({
@@ -332,7 +333,7 @@ const refreshTokenService = async (oldToken: string) => {
     if (existingToken) {
       await db.delete(refreshTokens).where(eq(refreshTokens.token, oldToken));
     }
-    throw new Error("Invalid or expired refresh token.");
+    throw new AppError("Invalid or expired refresh token.", 401);
   }
 
   await db.delete(refreshTokens).where(eq(refreshTokens.token, oldToken));

@@ -6,6 +6,43 @@ axios.defaults.withCredentials = true;
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
 
+const getSavedToken = () => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("access_token");
+  }
+  return null;
+};
+
+const getSavedRefreshToken = () => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("refresh_token");
+  }
+  return null;
+};
+
+const saveTokens = (token?: string | null, refreshToken?: string | null) => {
+  if (typeof window !== "undefined") {
+    if (token) localStorage.setItem("access_token", token);
+    if (refreshToken) localStorage.setItem("refresh_token", refreshToken);
+  }
+};
+
+const clearSavedTokens = () => {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+  }
+};
+
+// Request interceptor to automatically attach Authorization header
+axios.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token || getSavedToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export interface User {
   id: string;
   email: string;
@@ -37,13 +74,16 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  token: null,
+  token: getSavedToken(),
   isLoggedIn: false,
   checkingAuth: true,
 
   setIsLoggedIn: (value: boolean) => set({ isLoggedIn: value }),
   setUser: (user: User | null) => set({ user }),
-  setToken: (token: string | null) => set({ token }),
+  setToken: (token: string | null) => {
+    saveTokens(token);
+    set({ token });
+  },
 
   googleLogin: async () => {
     window.location.href = `${API_BASE_URL}/auth/google`;
@@ -55,10 +95,13 @@ export const useAuthStore = create<AuthState>((set) => ({
       password,
     });
     if (response.data && response.data.success) {
+      const token = response.data.token || null;
+      const refreshToken = response.data.refreshToken || null;
+      saveTokens(token, refreshToken);
       set({
         user: response.data.user,
         isLoggedIn: true,
-        token: response.data.token || null,
+        token: token,
       });
     } else {
       throw new Error(response.data.message || "Login failed");
@@ -72,10 +115,13 @@ export const useAuthStore = create<AuthState>((set) => ({
       password,
     });
     if (response.data && response.data.success) {
+      const token = response.data.token || null;
+      const refreshToken = response.data.refreshToken || null;
+      saveTokens(token, refreshToken);
       set({
         user: response.data.user,
         isLoggedIn: true,
-        token: response.data.token || null,
+        token: token,
       });
     } else {
       throw new Error(response.data.message || "Registration failed");
@@ -88,6 +134,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (err) {
       console.error("Backend logout error:", err);
     } finally {
+      clearSavedTokens();
       set({ user: null, isLoggedIn: false, token: null });
     }
   },
@@ -99,9 +146,11 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (response.data && response.data.success) {
         set({ user: response.data.user, isLoggedIn: true });
       } else {
+        clearSavedTokens();
         set({ user: null, isLoggedIn: false, token: null });
       }
     } catch (err) {
+      clearSavedTokens();
       set({ user: null, isLoggedIn: false, token: null });
     } finally {
       set({ checkingAuth: false });
@@ -136,12 +185,20 @@ axios.interceptors.response.use(
     ) {
       originalRequest._retry = true;
       try {
-        // Call refresh endpoint to get new access token cookie
-        await axios.post(`${API_BASE_URL}/auth/refresh`);
-        // Retry the original request
+        const refreshToken = getSavedRefreshToken();
+        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+          refreshToken,
+        });
+        const newToken = response.data?.token;
+        const newRefreshToken = response.data?.refreshToken;
+        if (newToken) {
+          saveTokens(newToken, newRefreshToken);
+          useAuthStore.getState().setToken(newToken);
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        }
         return axios(originalRequest);
       } catch (refreshError) {
-        // If refresh fails, clear auth state
+        clearSavedTokens();
         useAuthStore.getState().setUser(null);
         useAuthStore.getState().setToken(null);
         useAuthStore.getState().setIsLoggedIn(false);

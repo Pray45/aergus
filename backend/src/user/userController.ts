@@ -120,8 +120,14 @@ export const googleCallback = async (
 
     setAuthCookies(res, result.accessToken, result.refreshToken);
 
+    const clientUrl = (
+      process.env.CLIENT_URL || "http://localhost:3000"
+    ).replace(/\/$/, "");
+
     return res.redirect(
-      `${process.env.CLIENT_URL || "http://localhost:3000"}/w/xyz`,
+      `${clientUrl}/auth/callback?token=${encodeURIComponent(
+        result.accessToken,
+      )}&refreshToken=${encodeURIComponent(result.refreshToken)}`,
     );
   } catch (error) {
     next(error);

@@ -22,47 +22,40 @@
   --spacing-aergus-xl: var(--aergus-space-xl);
 
   --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "Geist Mono", "JetBrains Mono", monospace;
+  --font-mono: "Geist Mono", "Chivo Mono", "JetBrains Mono", monospace;
 }
 
 :root {
-
-  
-  
-  /* COLOR SYSTEM (Aergus Brand Palette) */
-
+  /* COLOR SYSTEM (Aergus Brand Palette - Rig.ai Inspired Red/Black Aesthetic) */
   --aergus-primary: #ff3100; /* Used for primary actions, active navigation indicator, badges, and focal highlights. */
-  --aergus-primary-hover: #ff451a; /* Slightly brighter/different shade for button and interaction hovers. */  
-  --aergus-bg: #0C0C0C; /*Applied to the base canvas/workspace body of the application. */
-  --aergus-card: #1a1a1a; /*Slightly elevated surfaces, sidebars, containers, and cards. */
-  --aergus-border: #2a2a2a; /* Used for layout dividers, borders, outlines, and structural guidelines. */
-  --aergus-text: #e5e2e1; /*High-contrast text color for primary headings, active item text, and critical details. */
-  --aergus-text-dim: 0.4; /* Opacity value used for descriptions, secondary text, metadata, and keyboard shortcuts. */
-
-
+  --aergus-primary-hover: #ff451a; /* Slightly brighter shade for interaction hovers. */  
+  --aergus-bg: #0A0A0B; /* Base canvas background */
+  --aergus-card: #121214; /* Elevated surfaces, cards, containers */
+  --aergus-border: #26262a; /* Guidelines & outlines */
+  --aergus-text: #f0ede6; /* High-contrast paper text */
+  --aergus-text-dim: 0.45; /* Dim opacity for metadata & descriptions */
 
   /* SPACING & LAYOUT SYSTEM */
-
-  --aergus-sidebar-width: 260px; /* Fixed horizontal space allocated to the navigation sidebar. */
-  --aergus-header-height: 64px; /* Fixed vertical space for the top header. */
+  --aergus-sidebar-width: 260px;
+  --aergus-header-height: 64px;
     
-  --aergus-space-xs: 4px; /* Ideal for tight gaps between list items, status indicators, and inner badges. */
-  --aergus-space-sm: 8px; /* Used for micro-spacing, small gaps, and horizontal/vertical item margins (p-2, gap-2). */
-  --aergus-space-md: 12px; /* Standard spacing for inner paddings of cards, dropdown items, list rows (p-3, px-3 py-2). */  
-  --aergus-space-lg: 16px; /* Standard gap between different dashboard modules, widgets, and sidebar groups (p-4, gap-4). */
-  --aergus-space-xl: 24px; /* Primary outer padding for major workspace layouts and header content (p-6, px-6). */
+  --aergus-space-xs: 4px;
+  --aergus-space-sm: 8px;
+  --aergus-space-md: 12px;  
+  --aergus-space-lg: 16px;
+  --aergus-space-xl: 24px;
 }
 
 .light {
   /* LIGHT THEME COLOR SYSTEM (Override custom variables) */
   --aergus-bg: #f8f9fa;      /* clean light grey background */
   --aergus-card: #ffffff;    /* card and sidebar background */
-  --aergus-border: #b0b4ba;  /* crisp, high-contrast border and separator color for light mode */
+  --aergus-border: #b0b4ba;  /* crisp border color for light mode */
   --aergus-text: #111827;    /* high-contrast dark text */
   --aergus-text-dim: 0.55;   /* dim text opacity for light theme */
 }
 
-/* Global resets and enhancements to make the dashboard more premium and professional */
+/* Global resets and enhancements */
 body {
   background-color: var(--aergus-bg);
   color: var(--aergus-text);
@@ -77,4 +70,52 @@ body {
 ::selection {
   background-color: var(--aergus-primary);
   color: #ffffff;
+}
+
+/* RIG.AI INSPIRED TECH STYLING UTILITIES */
+.btn-chamfer {
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-chamfer:hover {
+  transform: translateY(-1px);
+}
+
+.btn-chamfer:active {
+  transform: translateY(0);
+}
+
+.tech-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 2px;
+  border: 1px solid var(--aergus-border);
+  background: color-mix(in srgb, var(--aergus-card) 90%, transparent);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tech-hatch-bg {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 8px,
+    color-mix(in srgb, var(--aergus-border) 35%, transparent) 8px,
+    color-mix(in srgb, var(--aergus-border) 35%, transparent) 9px
+  );
+}
+
+@keyframes status-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.animate-status-blink {
+  animation: status-blink 1.8s ease-in-out infinite;
 }

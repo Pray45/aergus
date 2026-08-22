@@ -55,11 +55,11 @@
 
 .light {
   /* LIGHT THEME COLOR SYSTEM (Override custom variables) */
-  --aergus-bg: #f9f9fb;      /* clean light grey background */
+  --aergus-bg: #f8f9fa;      /* clean light grey background */
   --aergus-card: #ffffff;    /* card and sidebar background */
-  --aergus-border: #e4e4e7;  /* border color */
-  --aergus-text: #18181b;    /* high-contrast dark text */
-  --aergus-text-dim: 0.5;    /* dim text opacity for light theme */
+  --aergus-border: #b0b4ba;  /* crisp, high-contrast border and separator color for light mode */
+  --aergus-text: #111827;    /* high-contrast dark text */
+  --aergus-text-dim: 0.55;   /* dim text opacity for light theme */
 }
 
 /* Global resets and enhancements to make the dashboard more premium and professional */

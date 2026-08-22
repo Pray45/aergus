@@ -223,7 +223,7 @@ export default function Sidebar({
 
   return (
     <div
-      className={`flex flex-col w-sidebar-width h-screen bg-aergus-bg border-r border-aergus-border p-aergus-md font-mono text-aergus-text select-none ${className}`}
+      className={`hidden md:flex md:flex-col w-sidebar-width h-screen bg-aergus-bg border-r border-aergus-border p-aergus-md font-mono text-aergus-text select-none ${className}`}
     >
       <WorkspaceSwitcher />
 

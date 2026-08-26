@@ -139,7 +139,7 @@ export default function LoginPage() {
                 alt="Aergus Security & Auth"
                 width={340}
                 height={340}
-                className="w-full max-w-[240px] lg:max-w-[270px] h-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                className="w-full max-w-[240px] lg:max-w-[270px] h-auto object-contain transition-transform duration-300"
                 priority
               />
             </div>

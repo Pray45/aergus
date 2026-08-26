@@ -30,29 +30,7 @@ export default function WorkspaceTeamPage() {
   const [showInviteForm, setShowInviteForm] = useState(false);
 
   // realistic mock members list
-  const [members, setMembers] = useState<Member[]>([
-    {
-      id: "1",
-      name: "Hermione Granger",
-      email: "hermione@aergus.sh",
-      role: "OWNER",
-      status: "ACTIVE",
-    },
-    {
-      id: "2",
-      name: "Harry Potter",
-      email: "harry@aergus.sh",
-      role: "ADMIN",
-      status: "ACTIVE",
-    },
-    {
-      id: "3",
-      name: "Ron Weasley",
-      email: "ron@aergus.sh",
-      role: "MEMBER",
-      status: "ACTIVE",
-    },
-  ]);
+  const [members, setMembers] = useState<Member[]>([]);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();

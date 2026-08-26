@@ -36,10 +36,14 @@ const CreateWS: React.FC = () => {
         err.response?.data?.message ||
         err.message ||
         "Failed to create workspace.";
-      
+
       const is403 = err.response?.status === 403;
-      const isTier = errMsg.includes("limit") || errMsg.includes("upgrade") || errMsg.includes("tier") || errMsg.includes("Free tier");
-      
+      const isTier =
+        errMsg.includes("limit") ||
+        errMsg.includes("upgrade") ||
+        errMsg.includes("tier") ||
+        errMsg.includes("Free tier");
+
       if (is403 || isTier) {
         setIsTierLimitError(true);
         setError(errMsg);
@@ -84,8 +88,12 @@ const CreateWS: React.FC = () => {
                     <div className="border border-aergus-border rounded-sm p-4 bg-aergus-card/50 flex flex-col justify-between hover:border-aergus-primary/50 transition-colors">
                       <div>
                         <div className="flex justify-between items-center mb-1">
-                          <span className="text-[12px] font-bold text-aergus-text uppercase">TEAM TIER</span>
-                          <span className="text-[10px] px-1.5 py-0.5 bg-aergus-primary/20 text-aergus-primary rounded-sm font-bold">POPULAR</span>
+                          <span className="text-[12px] font-bold text-aergus-text uppercase">
+                            TEAM TIER
+                          </span>
+                          <span className="text-[10px] px-1.5 py-0.5 bg-aergus-primary/20 text-aergus-primary rounded-sm font-bold">
+                            POPULAR
+                          </span>
                         </div>
                         <p className="text-[10px] text-aergus-text-dim uppercase tracking-tight mb-2">
                           $29 / MONTH
@@ -102,11 +110,17 @@ const CreateWS: React.FC = () => {
                           setUpgrading(true);
                           try {
                             await upgradeTier("team");
-                            addToast("SUBSCRIBED TO TEAM TIER SECURE INSTANCE", "success");
+                            addToast(
+                              "SUBSCRIBED TO TEAM TIER SECURE INSTANCE",
+                              "success",
+                            );
                             setIsTierLimitError(false);
                             setError(null);
                           } catch (err: any) {
-                            addToast(err.message || "Failed to upgrade tier", "error");
+                            addToast(
+                              err.message || "Failed to upgrade tier",
+                              "error",
+                            );
                           } finally {
                             setUpgrading(false);
                           }
@@ -121,7 +135,9 @@ const CreateWS: React.FC = () => {
                     {/* Enterprise Tier Card */}
                     <div className="border border-aergus-border rounded-sm p-4 bg-aergus-card/50 flex flex-col justify-between hover:border-aergus-primary/50 transition-colors">
                       <div>
-                        <span className="text-[12px] font-bold text-aergus-text uppercase mb-1 block">ENTERPRISE</span>
+                        <span className="text-[12px] font-bold text-aergus-text uppercase mb-1 block">
+                          ENTERPRISE
+                        </span>
                         <p className="text-[10px] text-aergus-text-dim uppercase tracking-tight mb-2">
                           CUSTOM / BILLING
                         </p>
@@ -137,11 +153,17 @@ const CreateWS: React.FC = () => {
                           setUpgrading(true);
                           try {
                             await upgradeTier("enterprise");
-                            addToast("SUBSCRIBED TO ENTERPRISE TIER SECURE INSTANCE", "success");
+                            addToast(
+                              "SUBSCRIBED TO ENTERPRISE TIER SECURE INSTANCE",
+                              "success",
+                            );
                             setIsTierLimitError(false);
                             setError(null);
                           } catch (err: any) {
-                            addToast(err.message || "Failed to upgrade tier", "error");
+                            addToast(
+                              err.message || "Failed to upgrade tier",
+                              "error",
+                            );
                           } finally {
                             setUpgrading(false);
                           }
@@ -177,38 +199,7 @@ const CreateWS: React.FC = () => {
 
   return (
     <div className="font-mono text-aergus-text min-h-screen flex flex-col items-center justify-center relative bg-aergus-bg selection:bg-aergus-primary selection:text-white">
-      <main className="flex items-center justify-center w-full px-4 md:px-16 z-10 py-12">
-        <div className="w-full max-w-[480px]">
-          <Card
-            title="Create Workspace"
-            subtitle="Configure and spin up a new secure workspace instance"
-            systemState={
-              submitting ? "STATUS: PROVISIONING..." : "STATUS: READY"
-            }
-          >
-            <form onSubmit={handleSubmit} className="space-y-6 mt-6">
-              <Field
-                label="WORKSPACE NAME"
-                placeholder="ACME CORP"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-              <Field
-                label="DESCRIPTION"
-                placeholder="Primary secure development node"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-              <Button type="submit" disabled={submitting} className="mt-6">
-                {submitting
-                  ? "PROVISIONING INSTANCE..."
-                  : "INITIALIZE INSTANCE"}
-              </Button>
-            </form>
-          </Card>
-        </div>
-      </main>
+
     </div>
   );
 };

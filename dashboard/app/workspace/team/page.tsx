@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { useWorkspaceStore } from "../../store/workspaceStore";
 import { useToastStore } from "../../store/toastStore";
 import { Card } from "../../(auth)/authComponent/Card";
-import { Field } from "../../(auth)/authComponent/Field";
 import { Button } from "../../(auth)/authComponent/Button";
 import axios from "axios";
 import { Users, UserPlus, Shield } from "lucide-react";
@@ -102,14 +101,18 @@ export default function WorkspaceTeamPage() {
             systemState={inviting ? "STATUS: DISPATCHING..." : "STATUS: READY"}
           >
             <form onSubmit={handleInvite} className="space-y-4 mt-6">
-              <Field
-                label="EMAIL ADDRESS"
-                placeholder="developer@aergus.sh"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                type="email"
-              />
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-bold text-aergus-text uppercase tracking-widest">
+                  EMAIL ADDRESS
+                </label>
+                <input
+                  type="email"
+                  placeholder="developer@aergus.sh"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
               <div className="flex flex-col gap-2">
                 <label className="text-[10px] font-bold text-aergus-text uppercase tracking-widest">
                   ACCESS ROLE

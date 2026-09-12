@@ -1,0 +1,65 @@
+<svg width="720" height="620" viewBox="0 0 720 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>Aergus workspace control plane</title>
+  <desc>A connected workspace with projects, resources and telemetry nodes.</desc>
+  <g opacity="0.9">
+    <circle cx="360" cy="300" r="235" stroke="#26262A" stroke-width="1" stroke-dasharray="3 9"/>
+    <circle cx="360" cy="300" r="170" stroke="#26262A" stroke-width="1"/>
+    <circle cx="360" cy="300" r="92" stroke="#3A2420" stroke-width="1" stroke-dasharray="5 7"/>
+
+    <path d="M360 300L164 150M360 300L555 150M360 300L166 474M360 300L554 474" stroke="#4A2A24" stroke-width="1" stroke-dasharray="4 8"/>
+    <path d="M360 208V96M452 300H624M360 392V524M268 300H96" stroke="#3D2926" stroke-width="1" stroke-dasharray="2 10"/>
+
+    <g fill="#0A0A0B" stroke="#343438">
+      <rect x="112" y="102" width="104" height="70" rx="1"/>
+      <rect x="504" y="102" width="104" height="70" rx="1"/>
+      <rect x="112" y="438" width="104" height="70" rx="1"/>
+      <rect x="504" y="438" width="104" height="70" rx="1"/>
+    </g>
+
+    <g fill="#F0EDE6" font-family="monospace" font-size="10" letter-spacing="1.8">
+      <text x="128" y="128">PROJECTS</text>
+      <text x="520" y="128">RESOURCES</text>
+      <text x="128" y="464">TEAM</text>
+      <text x="520" y="464">INSIGHTS</text>
+    </g>
+    <g fill="#6D6B6B" font-family="monospace" font-size="8" letter-spacing="1">
+      <text x="128" y="148">03 ACTIVE</text>
+      <text x="520" y="148">12 CONNECTED</text>
+      <text x="128" y="484">08 MEMBERS</text>
+      <text x="520" y="484">LIVE SIGNAL</text>
+    </g>
+    <g fill="#FF3100">
+      <rect x="128" y="157" width="28" height="2"/>
+      <rect x="520" y="157" width="44" height="2"/>
+      <rect x="128" y="493" width="34" height="2"/>
+      <rect x="520" y="493" width="38" height="2"/>
+    </g>
+
+    <g>
+      <circle cx="360" cy="300" r="62" fill="#121214" stroke="#FF3100" stroke-opacity="0.8"/>
+      <circle cx="360" cy="300" r="47" stroke="#533027" stroke-width="1" stroke-dasharray="2 6"/>
+      <path d="M360 269V331M329 300H391" stroke="#FF3100" stroke-opacity="0.45"/>
+      <rect x="350" y="290" width="20" height="20" fill="#FF3100"/>
+      <path d="M354 294H366V306H354V294Z" fill="#0A0A0B"/>
+    </g>
+    <text x="360" y="360" text-anchor="middle" fill="#F0EDE6" font-family="monospace" font-size="10" letter-spacing="2">CONTROL PLANE</text>
+    <text x="360" y="376" text-anchor="middle" fill="#6D6B6B" font-family="monospace" font-size="8" letter-spacing="1.5">WORKSPACE ONLINE</text>
+
+    <g fill="#FF3100">
+      <circle cx="164" cy="150" r="4"/>
+      <circle cx="555" cy="150" r="4"/>
+      <circle cx="166" cy="474" r="4"/>
+      <circle cx="554" cy="474" r="4"/>
+      <circle cx="360" cy="96" r="3"/>
+      <circle cx="624" cy="300" r="3"/>
+      <circle cx="360" cy="524" r="3"/>
+      <circle cx="96" cy="300" r="3"/>
+    </g>
+    <g fill="#FF3100" opacity="0.32">
+      <circle cx="360" cy="96" r="9"/>
+      <circle cx="624" cy="300" r="9"/>
+      <circle cx="360" cy="524" r="9"/>
+      <circle cx="96" cy="300" r="9"/>
+    </g>
+  </g>
+</svg>

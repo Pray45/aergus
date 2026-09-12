@@ -1,7 +1,7 @@
 import React from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "github" | "link";
+  variant?: "primary" | "github" | "google" | "link";
   fullWidth?: boolean;
   children: React.ReactNode;
   icon?: React.ReactNode;
@@ -45,6 +45,19 @@ export const Button: React.FC<ButtonProps> = ({
         className={`text-aergus-primary hover:text-aergus-text hover:underline underline-offset-4 transition-colors font-mono cursor-pointer ${className}`}
         {...props}
       >
+        {children}
+      </button>
+    );
+  }
+
+  if (variant === "google") {
+    return (
+      <button
+        type="button"
+        className={`w-full h-11 btn-chamfer bg-aergus-bg border border-aergus-border hover:border-aergus-text/40 text-aergus-text font-bold text-xs font-mono uppercase tracking-wider transition-all flex items-center justify-center gap-3 cursor-pointer ${className}`}
+        {...props}
+      >
+        {icon}
         {children}
       </button>
     );

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ToastContainer } from "./components/ToastContainer";
+import { QuotaExceededModal } from "./components/QuotaExceededModal";
 
 export const metadata: Metadata = {
   title: "aergus",
@@ -39,6 +40,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-aergus-bg text-aergus-text">
         {children}
         <ToastContainer />
+        <QuotaExceededModal />
       </body>
     </html>
   );

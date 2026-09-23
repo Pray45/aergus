@@ -6,11 +6,13 @@ import {
   updateWorkspace,
   deleteWorkspace,
   addWorkspaceMember,
+  checkWorkspaceAvailability,
 } from "./workspaceController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
 const workspaceRouter = express.Router();
 
+workspaceRouter.get("/check-availability", protect, checkWorkspaceAvailability);
 workspaceRouter.post("/", protect, createWorkspace);
 workspaceRouter.get("/", protect, getAllWorkspaces);
 workspaceRouter.get("/:id", protect, getWorkspaceById);

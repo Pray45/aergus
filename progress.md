@@ -29,6 +29,34 @@ Last reviewed: 2026-09-08
 - Shared header, sidebar, workspace switcher, navigation items, inputs, loading state, and toast components exist.
 - Public workspace illustration assets are available for the login and workspace creation screens.
 
+## Services Built So Far
+
+### Backend (Express + TypeScript)
+
+All services live inside their feature folders (`backend/src/<feature>/<feature>Service*.ts`).
+
+| Service file | Exported services |
+|---|---|
+| `backend/src/user/userService.ts` | `registerService`, `loginService`, `getCurrentUser`, `getGoogleAuthorizationURL`, `exchangeGoogleCode`, `getGoogleUserprofile`, `handleGoogleLogin`, `revokeRefreshTokenService`, `refreshTokenService` |
+| `backend/src/workspace/workspaceService.ts` | `createWorkspaceService`, `addWorkspaceMemberService`, `updateWorkspaceService` |
+| `backend/src/project/projectServices.ts` | `createProjectService`, `updateProjectService` |
+| `backend/src/resources/resourceService.ts` | `createResourceService`, `getProjectResourcesService`, `getResourceService`, `updateResourceService`, `deleteResourceService` |
+
+Supporting layers per feature: Controller, Repository, and Routes (e.g. `projectController.ts`, `projectRepository.ts`, `projectRoutes.ts`), plus shared `config/`, `db/schema/`, `middleware/authMiddleware.ts`, and `utils/` (AppError, cookie, jwt).
+
+### Dashboard (Next.js frontend, Zustand stores)
+
+No `*service*` files exist on the frontend; the data layer is the Zustand stores under `dashboard/app/store/`:
+
+| Store file | Actions |
+|---|---|
+| `dashboard/app/store/authStore.ts` | `login`, `logout`, `googleLogin`, `register`, `checkSession`, `upgradeTier` (Axios with token/refresh interceptor + storage) |
+| `dashboard/app/store/workspaceStore.ts` | `fetchWorkspaces`, `createWorkspace`, `setActiveWorkspace` |
+| `dashboard/app/store/projectStore.ts` | `fetchProjects`, `createProject`, `setActiveProject`, `clearProjects` |
+| `dashboard/app/store/toastStore.ts` | `addToast`, `removeToast` |
+
+Note: `dashboard/app/workspace/team/page.tsx` also calls the API directly (Axios) for member invites, outside the store layer.
+
 ## Still To Create Or Finish
 
 ### Product functionality

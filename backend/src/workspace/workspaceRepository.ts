@@ -16,6 +16,21 @@ export const findWorkspaceBySlug = async (slug: string) => {
   return foundWorkspace ?? null;
 };
 
+export const findWorkspaceByNameOrSlug = async (name: string, slug: string) => {
+  const conditions = [];
+  if (slug) conditions.push(eq(workspace.slug, slug));
+  if (name) conditions.push(eq(workspace.name, name));
+
+  if (conditions.length === 0) return null;
+
+  const [foundWorkspace] = await db
+    .select({ id: workspace.id, name: workspace.name, slug: workspace.slug })
+    .from(workspace)
+    .where(conditions.length === 1 ? conditions[0] : or(...conditions));
+
+  return foundWorkspace ?? null;
+};
+
 export const findWorkspaceById = async (id: string) => {
   const [foundWorkspace] = await db
     .select()

@@ -5,6 +5,52 @@ import {
 } from "./workspaceService.js";
 import * as workspaceRepository from "./workspaceRepository.js";
 import { Request, Response, NextFunction } from "express";
+import slugify from "slugify";
+
+export const checkWorkspaceAvailability = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { name, slug } = req.query;
+
+    const rawName = typeof name === "string" ? name.trim() : "";
+    let rawSlug = typeof slug === "string" ? slug.trim() : "";
+
+    if (!rawSlug && rawName) {
+      rawSlug = slugify(rawName, { lower: true, strict: true });
+    }
+
+    if (!rawName && !rawSlug) {
+      return res.status(400).json({
+        success: false,
+        message: "Workspace name or slug is required to check availability.",
+      });
+    }
+
+    const existing = await workspaceRepository.findWorkspaceByNameOrSlug(
+      rawName,
+      rawSlug,
+    );
+
+    if (existing) {
+      return res.status(200).json({
+        success: true,
+        available: false,
+        message: "Workspace name is already taken.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      available: true,
+      message: "Workspace name is available.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const createWorkspace = async (
   req: Request,
